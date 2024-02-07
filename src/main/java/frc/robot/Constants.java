@@ -8,6 +8,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
+
+  public static final int CANdleid = 20;
     public static final class ModuleConstants {
         // these constants should be correct for the current 4ki module we are using 
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
