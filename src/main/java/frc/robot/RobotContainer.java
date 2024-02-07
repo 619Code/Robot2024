@@ -1,26 +1,44 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.SwerveCommand;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.DriveToPointCommand;
 
 public class RobotContainer {
 
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final XboxController driverOne = new XboxController(0);
+
     public RobotContainer() {
-        configureBindings();
+        swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+        configureButtonBindings();
     }
 
-  
-    private void configureBindings() {
+    private void configureButtonBindings() {
+
         //
+        
+    }
+
+    public SwerveSubsystem getSwerve() {
+        return swerveSubsystem;
     }
 
     public Command getAutonomousCommand() {
-        return null;
+
+        return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+            new Rotation2d(0), 
+            new Rotation2d(0),
+            new Rotation2d(0),
+            new Rotation2d(0)}))
+        .andThen( () -> swerveSubsystem.resetOdometry())
+        .andThen(new DriveToPointCommand(swerveSubsystem, -1, 2, 0.05))
+        ;
+        
     }
 }
