@@ -9,6 +9,17 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
+    public static final class ManipulatorConstants {
+        public static final int kIntakeLeaderPort = -1;
+        public static final boolean kInakeLeaderInverted = false;
+        public static final int kShooterLeaderPort = -1;
+        public static final boolean kShooterLeaderInverted = false;
+
+        public static final int kIntakeSensorPort = -1;
+        public static final int kMiddleSensorPort = -1;
+        
+    }
+
   public static final int CANdleid = 20;
     public static final class ModuleConstants {
         // these constants should be correct for the current 4ki module we are using 
