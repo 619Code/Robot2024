@@ -17,4 +17,9 @@ public class IntakeCommand extends Command{
     public void initialize() {
         subsystem.spintake(-.05);
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        subsystem.stopIntake();
+    }
 }

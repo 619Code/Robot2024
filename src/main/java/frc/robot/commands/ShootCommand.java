@@ -17,4 +17,9 @@ public class ShootCommand extends Command{
     public void initialize() {
         subsystem.spinShooter(-.05);
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        subsystem.stopShooter();
+    }
 }

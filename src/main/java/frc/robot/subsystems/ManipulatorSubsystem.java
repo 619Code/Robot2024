@@ -51,6 +51,19 @@ public class ManipulatorSubsystem extends SubsystemBase {
         return middleProximitySensor.get();
     }
 
+    public void stopIntake(){
+        intakeLeader.stopMotor();;
+    }
+
+    public void stopShooter(){
+        shooterLeader.stopMotor();;
+    }
+
+    public void stopAll(){
+        intakeLeader.stopMotor();
+        shooterLeader.stopMotor();
+    }
+
 
     
     
