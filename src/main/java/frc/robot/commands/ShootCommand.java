@@ -15,7 +15,7 @@ public class ShootCommand extends Command{
 
     @Override
     public void initialize() {
-        subsystem.spinShooter(-.05);
+        subsystem.spinShooter(.05); // test value, make sure to change once we g
     }
 
     @Override

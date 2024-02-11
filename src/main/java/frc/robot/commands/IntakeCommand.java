@@ -15,7 +15,7 @@ public class IntakeCommand extends Command{
 
     @Override
     public void initialize() {
-        subsystem.spintake(-.05);
+        subsystem.spintake(-.05); // test value plz change
     }
 
     @Override

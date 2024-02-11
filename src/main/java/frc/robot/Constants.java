@@ -15,10 +15,29 @@ public final class Constants {
         public static final int kShooterLeaderPort = -1;
         public static final boolean kShooterLeaderInverted = false;
 
+        public static final double intakeSpeed = -0.05;
+        public static final double outtakeSpeed = -0.05;
+
         public static final int kIntakeSensorPort = -1;
         public static final int kMiddleSensorPort = -1;
         
     }
+
+    public static final class HingeConstants {
+        public static final int kHingeLeaderPort = -1;
+        public static final int kHingeFollowerPort = -1;
+        public static final boolean kHingeLeaderInverted = false;
+        public static final boolean kHingeFollowerInverted = false;
+
+        public static final int kAbsoluteEncoderPort = -1;
+        public static final double kMaxAngle = 0; //TEMP VALUE
+        public static final double kMinAngle = 0; //TEMP VALUE
+
+        public static final double kHingeP = 0;
+        public static final double kHingeI = 0;
+        public static final double kHingeD = 0;
+        public static final double kHingeF = 0;
+        }
 
   public static final int CANdleid = 20;
     public static final class ModuleConstants {
