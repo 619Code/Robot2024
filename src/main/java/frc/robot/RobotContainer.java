@@ -10,17 +10,60 @@ import frc.robot.commands.DriveToPointCommand;
 
 public class RobotContainer {
 
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    //                         SUBSYSTEM ENABLE/DISABLE CONTROLS                        //
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    private final boolean enableDrivetrain  = true;
+    private final boolean enableHinge       = false;
+    private final boolean enableManipulator = false;
+    private final boolean enableClimb       = false;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final XboxController driverOne = new XboxController(0);
 
     public RobotContainer() {
-        swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+
+        if (enableDrivetrain) {
+            swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+        }
+
+        if (enableHinge) {
+            //
+        }
+
+        if (enableManipulator) {
+            //
+        }
+
+        if (enableClimb) {
+            //
+        }
+
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
 
-        //
+        if (enableDrivetrain) {
+            //
+        }
+
+        if (enableHinge) {
+            //
+        }
+
+        if (enableManipulator) {
+            //
+        }
+
+        if (enableClimb) {
+            //
+        }
         
     }
 
