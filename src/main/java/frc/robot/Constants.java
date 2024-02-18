@@ -33,10 +33,20 @@ public final class Constants {
         public static final double kMaxAngle = 0; //TEMP VALUE
         public static final double kMinAngle = 0; //TEMP VALUE
 
-        public static final double kHingeP = 0;
-        public static final double kHingeI = 0;
-        public static final double kHingeD = 0;
-        public static final double kHingeF = 0;
+        public static final double kHingeP = 0; //UNTUNED
+        public static final double kHingeI = 0; //UNTUNED
+        public static final double kHingeD = 0; //UNTUNED
+        public static final double kHingeG = .14; //TEMP VALUE NEEDS TUNING
+        public static final double kHingeV = 5.35; //TEMP VALUE NEEDS TUNING
+        public static final double kHingeA = 0.0; //TEMP VALUE NEEDS TUNING
+        public static final double kHingeS = 0.0;//TEMP VALUE NEEDS TUNING\
+
+        public static final double kHingeMaxVelocityRadPerSecond = 0;
+        public static final double KHingeMaxAccelerationRadPerSecond = 0;
+
+        public static final double kIntakeAngle = 0;
+        public static final double kShootingAngle = 0;
+        public static final double kAmpAngle = 0;
         }
 
   public static final int CANdleid = 20;

@@ -5,24 +5,31 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
-import frc.robot.Constants.PIDConstants;
 
-public class HingeSubsystem extends SubsystemBase {
+public class HingeSubsystem extends ProfiledPIDSubsystem {
     private final CANSparkMax hingeLeader;
     private final CANSparkMax hingeFollower;
 
     private final CANcoder encoder;
 
-    private final PIDController pid;
-    private final double kP;
-    private final double kI;
-    private final double kD;
-    private final double ff;
+    private final ArmFeedforward ff;
 
     public HingeSubsystem() {
+        super(
+            new ProfiledPIDController(
+                Constants.HingeConstants.kHingeP, 
+                Constants.HingeConstants.kHingeI, 
+                Constants.HingeConstants.kHingeD, 
+                new TrapezoidProfile.Constraints(
+                    Constants.HingeConstants.kHingeMaxVelocityRadPerSecond, 
+                    Constants.HingeConstants.KHingeMaxAccelerationRadPerSecond)),
+        0);
         hingeLeader = new CANSparkMax(Constants.HingeConstants.kHingeLeaderPort, MotorType.kBrushless);
         hingeLeader.restoreFactoryDefaults();
         hingeLeader.setIdleMode(IdleMode.kBrake);
@@ -39,15 +46,25 @@ public class HingeSubsystem extends SubsystemBase {
 
         hingeFollower.follow(hingeLeader);
 
-        kP = Constants.HingeConstants.kHingeP;
-        kI = Constants.HingeConstants.kHingeI;
-        kD = Constants.HingeConstants.kHingeD;
-        ff = Constants.HingeConstants.kHingeF;
-        pid = new PIDController(kP, kI, kD);
+        ff = new ArmFeedforward(Constants.HingeConstants.kHingeS, Constants.HingeConstants.kHingeG, Constants.HingeConstants.kHingeV, Constants.HingeConstants.kHingeA);
+    }
+
+    @Override
+    protected void useOutput(double output, State setpoint) {
+        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
+
+        hingeLeader.setVoltage(output + feedforward);
+    }
+
+    @Override
+    protected double getMeasurement() {
+        return getAbsolteAngle();
     }
 
     @Override
     public void periodic() {
+        super.periodic();
+        checkLimits();
     }
 
     public void checkLimits() {
@@ -68,7 +85,12 @@ public class HingeSubsystem extends SubsystemBase {
         return (encoder.getAbsolutePosition().getValue());
     }
 
-    public void goToPosition(double setpoint) {
-        hingeLeader.set(pid.calculate(getAbsoluteRotations(), setpoint));
+    public boolean isAtPosition(double setpoint, double deadzone) {
+        if (getAbsolteAngle() <= (setpoint + deadzone) || getAbsolteAngle() >= (setpoint - deadzone)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
