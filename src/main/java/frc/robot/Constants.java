@@ -24,10 +24,10 @@ public final class Constants {
     }
 
     public static final class HingeConstants {
-        public static final int kHingeLeaderPort = -1;
-        public static final int kHingeFollowerPort = -1;
+        public static final int kHingeLeaderPort = 52;
+        public static final int kHingeFollowerPort = 61;
         public static final boolean kHingeLeaderInverted = false;
-        public static final boolean kHingeFollowerInverted = false;
+        public static final boolean kHingeFollowerInverted = true;
 
         public static final int kAbsoluteEncoderPort = -1;
         public static final double kMaxAngle = 0; //TEMP VALUE
