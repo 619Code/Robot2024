@@ -29,7 +29,8 @@ public final class Constants {
         public static final boolean kHingeLeaderInverted = true;
         public static final boolean kHingeFollowerInverted = false;
 
-        public static final int kAbsoluteEncoderPort = -1;
+        public static final int kAbsoluteEncoderPort = 0;
+        public static final int kAbsoluteEncoderOffset = -1;
         public static final double kMaxAngle = 0; //TEMP VALUE
         public static final double kMinAngle = 0; //TEMP VALUE
 

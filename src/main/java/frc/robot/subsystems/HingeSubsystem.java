@@ -9,16 +9,24 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
+import frc.robot.helpers.Crashboard;
 
 public class HingeSubsystem extends ProfiledPIDSubsystem {
     private final CANSparkMax hingeLeader;
     private final CANSparkMax hingeFollower;
 
-    private final CANcoder encoder;
+    private final DutyCycleEncoder encoder;
 
     private final ArmFeedforward ff;
+
+    private static double kP;
+    private static double kI;
+    private static double kD;
 
     public HingeSubsystem() {
         super(
@@ -30,6 +38,15 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
                     Constants.HingeConstants.kHingeMaxVelocityRadPerSecond, 
                     Constants.HingeConstants.KHingeMaxAccelerationRadPerSecond)),
         0);
+
+        kP = Constants.HingeConstants.kHingeP;
+        kI = Constants.HingeConstants.kHingeI;
+        kD = Constants.HingeConstants.kHingeD;
+
+        Crashboard.toDashboard("kP", kP, "Hinge");
+        Crashboard.toDashboard("kI", kI, "Hinge");
+        Crashboard.toDashboard("kD", kD, "Hinge");
+
         hingeLeader = new CANSparkMax(Constants.HingeConstants.kHingeLeaderPort, MotorType.kBrushless);
         hingeLeader.restoreFactoryDefaults();
         hingeLeader.setIdleMode(IdleMode.kBrake);
@@ -42,7 +59,9 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         hingeFollower.setSmartCurrentLimit(35);
         hingeFollower.setInverted(Constants.HingeConstants.kHingeFollowerInverted);
 
-        encoder = new CANcoder(Constants.HingeConstants.kAbsoluteEncoderPort);
+        encoder = new DutyCycleEncoder(Constants.HingeConstants.kAbsoluteEncoderPort);
+        encoder.setDistancePerRotation(360.0);
+        encoder.setPositionOffset(Constants.HingeConstants.kAbsoluteEncoderOffset);
 
         hingeFollower.follow(hingeLeader);
 
@@ -65,6 +84,10 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     public void periodic() {
         super.periodic();
         checkLimits();
+        
+        getController().setP(SmartDashboard.getNumber("kP", Constants.HingeConstants.kHingeP));
+        getController().setI(SmartDashboard.getNumber("kI", Constants.HingeConstants.kHingeI));
+        getController().setD(SmartDashboard.getNumber("kD", Constants.HingeConstants.kHingeD));
     }
 
     public void checkLimits() {
@@ -77,12 +100,8 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         hingeLeader.stopMotor();
     }
 
-    public double getAbsolteAngle() { // -180, 360
-        return (encoder.getAbsolutePosition().getValue() * 360);
-    }
-
-    public double getAbsoluteRotations() { // -.5 , 1
-        return (encoder.getAbsolutePosition().getValue());
+    public double getAbsolteAngle() {
+        return (encoder.getAbsolutePosition());
     }
 
     public boolean isAtPosition(double setpoint, double deadzone) {
