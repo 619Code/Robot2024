@@ -26,7 +26,7 @@ public class TestHingeCommand extends Command {
     public void execute() {
         speed = controller.getLeftY();
         if (Math.abs(speed) < 0.1) speed = 0;
-        subsystem.spinge(speed * 0.1);
+        subsystem.spinge(speed * 0.25);
     }
 
     @Override
