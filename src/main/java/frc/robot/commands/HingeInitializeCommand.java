@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.HingeSubsystem;
 
-public class GoToInakePosCommand extends Command {
+public class HingeInitializeCommand extends Command {
     private HingeSubsystem subsystem;
 
-    public GoToInakePosCommand(HingeSubsystem subsystem) {
+    public HingeInitializeCommand(HingeSubsystem subsystem) {
         this.subsystem = subsystem;
 
         addRequirements(subsystem);
@@ -15,18 +15,21 @@ public class GoToInakePosCommand extends Command {
 
     @Override
     public void initialize() {
-        subsystem.setGoal(Constants.HingeConstants.kIntakeAngle);
-        subsystem.enable();
+        subsystem.spinge(-.01);
     }
 
     @Override
     public void end(boolean interrupted) {
-        subsystem.disable();
+        subsystem.stopHinge();
     }
 
     @Override
     public boolean isFinished() {
-        //return subsystem.isAtPosition(Constants.HingeConstants.kIntakeAngle, 0 /*temp deadzone*/);
-        return subsystem.getController().atGoal();
+        if (subsystem.getAbsoluteDegrees() <= Constants.HingeConstants.kMinAngle) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

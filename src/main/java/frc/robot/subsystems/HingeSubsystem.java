@@ -43,9 +43,9 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         kI = Constants.HingeConstants.kHingeI;
         kD = Constants.HingeConstants.kHingeD;
 
-        Crashboard.toDashboard("kP", kP, "Hinge");
-        Crashboard.toDashboard("kI", kI, "Hinge");
-        Crashboard.toDashboard("kD", kD, "Hinge");
+        Crashboard.AddSlider("kP", kP, "Hinge", 0, 4);
+        Crashboard.AddSlider("kI", kI, "Hinge", 0, 4);
+        Crashboard.AddSlider("kD", kD, "Hinge", 0, 4);
 
         hingeLeader = new CANSparkMax(Constants.HingeConstants.kHingeLeaderPort, MotorType.kBrushless);
         hingeLeader.restoreFactoryDefaults();
@@ -63,7 +63,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         encoder.setDistancePerRotation(360.0);
         encoder.setPositionOffset(Constants.HingeConstants.kAbsoluteEncoderOffset);
 
-        hingeFollower.follow(hingeLeader);
+        //hingeFollower.follow(hingeLeader);
 
         ff = new ArmFeedforward(Constants.HingeConstants.kHingeS, Constants.HingeConstants.kHingeG, Constants.HingeConstants.kHingeV, Constants.HingeConstants.kHingeA);
     }
@@ -73,6 +73,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
 
         hingeLeader.setVoltage(output + feedforward);
+        hingeFollower.setVoltage(output + feedforward);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     public void periodic() {
         super.periodic();
         checkLimits();
-        
+
         getController().setP(SmartDashboard.getNumber("kP", Constants.HingeConstants.kHingeP));
         getController().setI(SmartDashboard.getNumber("kI", Constants.HingeConstants.kHingeI));
         getController().setD(SmartDashboard.getNumber("kD", Constants.HingeConstants.kHingeD));
@@ -104,6 +105,16 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         return (encoder.getAbsolutePosition());
     }
 
+    public void spinge(double speed) {
+        hingeLeader.set(speed);
+        hingeFollower.set(speed);
+    }
+
+    public void stopHinge(){
+        hingeLeader.stopMotor();
+        hingeFollower.stopMotor();
+    }
+
     public boolean isAtPosition(double setpoint, double deadzone) {
         if (getAbsolteAngle() <= (setpoint + deadzone) || getAbsolteAngle() >= (setpoint - deadzone)) {
             return true;
@@ -111,5 +122,10 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         else {
             return false;
         }
+    }
+
+    public double getAbsoluteDegrees() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAbsoluteDegrees'");
     }
 }

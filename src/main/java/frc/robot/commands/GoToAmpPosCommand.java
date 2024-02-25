@@ -26,6 +26,7 @@ public class GoToAmpPosCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return subsystem.isAtPosition(Constants.HingeConstants.kAmpAngle, 0 /*temp deadzone*/);
+        //return subsystem.isAtPosition(Constants.HingeConstants.kAmpAngle, 0 /*temp deadzone*/);
+        return subsystem.getController().atGoal();
     }
 }
