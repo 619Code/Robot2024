@@ -146,4 +146,18 @@ public final class Constants {
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7;
     }
+
+    public static final class ManipulatorConstants {
+        public static final int kIntakeLeaderPort = 60;  //20;  Test bed  value
+        public static final boolean kInakeLeaderInverted = false;
+        public static final int kShooterLeaderPort = 54; //10; TEst bed value
+        public static final boolean kShooterLeaderInverted = true;
+
+        public static final double intakeSpeed = 0.01;
+        public static final double intakeSpeedWhenOuttaking = 0.04;
+        public static final double outtakeSpeed = 0.01;
+
+        public static final int kIntakeSensorPort = 1;  //0f test bed value
+        
+    }
 } 

@@ -9,24 +9,24 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.SwerveSubsystem;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class SwerveCommand extends Command {
 
     private final SwerveSubsystem swerveSubsystem;
-    private final XboxController controller;
+    private final CommandXboxController controller;
     private CANcoder FrontLeftCoder;
     private CANSparkMax FrontLeftTurnSpark;
 
     private SlewRateLimiter driveLimiter, driveLimiterX, driveLimiterY, turnLimiter;
 
-    public SwerveCommand(SwerveSubsystem swerveSubsystem, XboxController controller) {
+    public SwerveCommand(SwerveSubsystem swerveSubsystem, CommandXboxController controller) {
         this.swerveSubsystem = swerveSubsystem;
         this.controller = controller;
         addRequirements(swerveSubsystem);

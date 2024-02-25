@@ -1,17 +1,25 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveCommand;
+import frc.robot.subsystems.ManipulatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.DriveToPointCommand;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.ShootCommand;
+import frc.robot.commands.StopManipulatorCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController; // Can I do this?
 
 public class RobotContainer {
 
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    private final XboxController driverOne = new XboxController(0);
+    private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
+
+    private final CommandXboxController driverOne = new CommandXboxController(0);
+    private final CommandXboxController operatorOne = new CommandXboxController(1);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
@@ -20,8 +28,23 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
 
-        //
-        
+        //  =========   MANIPULATOR BINDINGS   =========
+
+        //  Run intake command on {y} press
+        Trigger intakeTrigger = operatorOne.y();
+        intakeTrigger.onTrue(new IntakeCommand(manipulatorSubsystem));
+        // Stop manipulator {y} lift
+        intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+
+        //  Run shoot command on {a} press
+        Trigger shootTrigger = operatorOne.a();
+        shootTrigger.onTrue(new ShootCommand(manipulatorSubsystem));
+        // Stop manipulator on {a} lift
+        shootTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+
+
+        //   =========   OTHER BINDINGS   =========
+    
     }
 
     public SwerveSubsystem getSwerve() {
