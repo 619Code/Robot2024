@@ -1,12 +1,14 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.helpers.Crashboard;
 
 public class ManipulatorSubsystem extends SubsystemBase {
 
@@ -14,6 +16,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public final CANSparkMax shooterLeader;
 
     public final DigitalInput intakeProximitySensor;
+
+    public final RelativeEncoder shooterEncoder;
 
     public ManipulatorSubsystem() {
         intakeLeader = new CANSparkMax(Constants.ManipulatorConstants.kIntakeLeaderPort, MotorType.kBrushless);
@@ -30,6 +34,22 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
         intakeProximitySensor = new DigitalInput(Constants.ManipulatorConstants.kIntakeSensorPort);
 
+        shooterEncoder = this.shooterLeader.getEncoder();
+
+    }
+
+    @Override
+    public void periodic() {
+        
+        Crashboard.toDashboard("Sensor value: ", intakeProximitySensor.get(), "Manipulator");
+
+        
+
+    }
+
+    public double GetShooterVelocity(){
+
+        return shooterEncoder.getVelocity();
 
     }
 

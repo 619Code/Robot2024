@@ -15,14 +15,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController; // Can I do 
 
 public class RobotContainer {
 
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+ //   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
 
     private final CommandXboxController driverOne = new CommandXboxController(0);
     private final CommandXboxController operatorOne = new CommandXboxController(1);
 
     public RobotContainer() {
-        swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+ //       swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
         configureButtonBindings();
     }
 
@@ -36,32 +36,40 @@ public class RobotContainer {
         // Stop manipulator {y} lift
         intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-        //  Run shoot command on {a} press
-        Trigger shootTrigger = operatorOne.a();
-        shootTrigger.onTrue(new ShootCommand(manipulatorSubsystem));
+        //  Run shoot speaker command on {a} press
+        Trigger shootSpeakerTrigger = operatorOne.a();
+        shootSpeakerTrigger.onTrue(new ShootCommand(manipulatorSubsystem, Constants.ManipulatorConstants.outtakeSpeedSpeaker, Constants.ManipulatorConstants.intakeSpeedWhenOuttaking, Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote));
         // Stop manipulator on {a} lift
-        shootTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+        shootSpeakerTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+
+        //  Run shoot amp command on {b} press
+        Trigger shootAmpTrigger = operatorOne.b();
+        shootAmpTrigger.onTrue(new ShootCommand(manipulatorSubsystem, Constants.ManipulatorConstants.outtakeSpeedAmp, Constants.ManipulatorConstants.intakeSpeedWhenOuttaking, Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote));
+        // Stop manipulator on {a} lift
+        shootAmpTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
 
         //   =========   OTHER BINDINGS   =========
     
     }
 
-    public SwerveSubsystem getSwerve() {
-        return swerveSubsystem;
-    }
+    // public SwerveSubsystem getSwerve() {
+    //     return swerveSubsystem;
+    // }
 
     public Command getAutonomousCommand() {
 
-        return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
-        .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-        .andThen( () -> swerveSubsystem.resetOdometry())
-        .andThen(new DriveToPointCommand(swerveSubsystem, -1, 2, 0.05))
-        ;
+        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+        //     new Rotation2d(0), 
+        //     new Rotation2d(0),
+        //     new Rotation2d(0),
+        //     new Rotation2d(0)}))
+        // .andThen( () -> swerveSubsystem.resetOdometry())
+        // .andThen(new DriveToPointCommand(swerveSubsystem, -1, 2, 0.05))
+        // ;
+
+        return null;
         
     }
 }
