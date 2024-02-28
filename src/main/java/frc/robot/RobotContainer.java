@@ -36,7 +36,7 @@ public class RobotContainer {
         //    hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem)); 
         // });
 
-        hingeSubsystem.setDefaultCommand(new TestHingeCommand(hingeSubsystem, driverOne));
+        hingeSubsystem.setDefaultCommand(new TestHingeCommand(hingeSubsystem, operatorController));
 
         //hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
 
@@ -48,11 +48,15 @@ public class RobotContainer {
         //operatorController.a().whileTrue(new GoToInakePosCommand(hingeSubsystem));
         //operatorController.y().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
 
-        driverOne.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
+        operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
     }
 
     public SwerveSubsystem getSwerve() {
         return null;//swerveSubsystem;
+    }
+
+    public void InitializeHinge() {
+        new HingeInitializeCommand(hingeSubsystem).schedule();
     }
 
     public Command getAutonomousCommand() {

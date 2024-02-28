@@ -42,7 +42,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
                 new TrapezoidProfile.Constraints(
                     Constants.HingeConstants.kHingeMaxVelocityRadPerSecond, 
                     Constants.HingeConstants.KHingeMaxAccelerationRadPerSecond)),
-        0);
+        Constants.HingeConstants.kShootingAngle);
 
         kP = Constants.HingeConstants.kHingeP;
         kI = Constants.HingeConstants.kHingeI;
@@ -60,7 +60,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
         hingeFollower = new CANSparkMax(Constants.HingeConstants.kHingeFollowerPort, MotorType.kBrushless);
         hingeFollower.restoreFactoryDefaults();
-        hingeFollower.setIdleMode(IdleMode.kBrake);
+        hingeFollower.setIdleMode(IdleMode.kCoast);
         hingeFollower.setSmartCurrentLimit(35);
         hingeFollower.setInverted(Constants.HingeConstants.kHingeFollowerInverted);
 
@@ -86,7 +86,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
     @Override
     protected double getMeasurement() {
-        return getAbsoluteAngle();
+        return getAbsoluteDegrees();
     }
 
 
@@ -99,10 +99,10 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         getController().setI(SmartDashboard.getNumber("kI", Constants.HingeConstants.kHingeI));
         getController().setD(SmartDashboard.getNumber("kD", Constants.HingeConstants.kHingeD));
 
-        Crashboard.toDashboard("Left Motor Encoder", hingeLeader.getEncoder().getPosition(), "Hinge");
-        Crashboard.toDashboard("Right Motor Encoder", hingeLeader.getEncoder().getPosition(), "Hinge");
+        Crashboard.toDashboard("Leader Encoder", hingeLeader.getEncoder().getPosition(), "Hinge");
+        Crashboard.toDashboard("Follower Encoder", hingeFollower.getEncoder().getPosition(), "Hinge");
         Crashboard.toDashboard("AbsoluteEncoderPositon", getAbsoluteAngle(), "Hinge");
-        Crashboard.toDashboard("AbsoluteEncoderAngle", getAbsoluteDegrees(), "Hinge");
+        Crashboard.toDashboard("AbsoluteEncoderDegrees", getAbsoluteDegrees(), "Hinge");
 
     }
 
@@ -136,7 +136,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     }
 
     public boolean isAtPosition(double setpoint, double deadzone) {
-        if (getAbsoluteAngle() <= (setpoint + deadzone) || getAbsoluteAngle() >= (setpoint - deadzone)) {
+        if (getAbsoluteDegrees() <= (setpoint + deadzone) || getAbsoluteDegrees() >= (setpoint - deadzone)) {
             return true;
         }
         else {

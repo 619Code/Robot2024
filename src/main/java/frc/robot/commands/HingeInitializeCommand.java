@@ -26,6 +26,11 @@ public class HingeInitializeCommand extends Command {
     }
 
     @Override
+    public InterruptionBehavior getInterruptionBehavior() {
+        return InterruptionBehavior.kCancelIncoming;
+    }
+
+    @Override
     public boolean isFinished() {
         if (subsystem.getAbsoluteDegrees() <= Constants.HingeConstants.kMinAngle+1) {
             subsystem.resetRelativeEncoders();
