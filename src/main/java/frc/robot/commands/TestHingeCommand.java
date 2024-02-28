@@ -2,14 +2,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.TestHingeSubsystem;
 
 public class TestHingeCommand extends Command {
-    TestHingeSubsystem subsystem;
+    HingeSubsystem subsystem;
     double speed = 0;
     CommandXboxController controller;
 
-    public TestHingeCommand(TestHingeSubsystem subsystem, CommandXboxController contr) {
+    public TestHingeCommand(HingeSubsystem subsystem, CommandXboxController contr) {
         this.subsystem = subsystem;
         if (Math.abs(speed) < 0.1) speed = 0;
         controller = contr;
@@ -20,6 +21,7 @@ public class TestHingeCommand extends Command {
     @Override
     public void initialize() {
         //subsystem.spinge(speed * .1);
+        
     }
 
     @Override

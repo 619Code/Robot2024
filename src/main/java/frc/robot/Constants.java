@@ -26,14 +26,17 @@ public final class Constants {
     public static final class HingeConstants {
         public static final int kHingeLeaderPort = 52; // left motor
         public static final int kHingeFollowerPort = 61; // right motor
-        public static final boolean kHingeLeaderInverted = true;
-        public static final boolean kHingeFollowerInverted = false;
+        public static final boolean kHingeLeaderInverted = false;
+        public static final boolean kHingeFollowerInverted = true;
 
         public static final int kAbsoluteEncoderPort = 0;
         public static final int kAbsoluteEncoderOffset = 0;
-        public static final double kMaxAngle = 132; //TEMP VALUE
+        public static final double kMaxAngle = 128; //TEMP VALUE
         public static final double kMinAngle = 60; //TEMP VALUE
 
+        public static final float topEncoderSoftLimit = 73;
+        public static final float bottomEncoderSoftLimit = -0.01f;
+        
         public static final double kHingeP = 0; //UNTUNED
         public static final double kHingeI = 0; //UNTUNED
         public static final double kHingeD = 0; //UNTUNED
@@ -45,9 +48,15 @@ public final class Constants {
         public static final double kHingeMaxVelocityRadPerSecond = 0;
         public static final double KHingeMaxAccelerationRadPerSecond = 0;
 
-        public static final double kIntakeAngle = 0;
-        public static final double kShootingAngle = 0;
-        public static final double kAmpAngle = 0;
+        public static final double kIntakeAngle = 100;
+        public static final double kShootingAngle = 60;
+        public static final double kAmpAngle = 120;
+
+        public static final double rawEncoderLow = .88;
+        public static final double rawEncoderHigh = .617;
+        public static final double degreesLow = 60;
+        public static final double degreesHigh = 128;
+
         }
 
   public static final int CANdleid = 20;

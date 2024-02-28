@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -21,6 +23,9 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     private final CANSparkMax hingeFollower;
 
     private final DutyCycleEncoder encoder;
+
+    private RelativeEncoder hingeLeaderRelativeEncoder;     
+    private RelativeEncoder hingeFollowerRelativeEncoder;
 
     private final ArmFeedforward ff;
 
@@ -63,6 +68,9 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         encoder.setDistancePerRotation(360.0);
         encoder.setPositionOffset(Constants.HingeConstants.kAbsoluteEncoderOffset);
 
+        hingeLeaderRelativeEncoder = hingeLeader.getEncoder();
+        hingeFollowerRelativeEncoder = hingeFollower.getEncoder();
+
         //hingeFollower.follow(hingeLeader);
 
         ff = new ArmFeedforward(Constants.HingeConstants.kHingeS, Constants.HingeConstants.kHingeG, Constants.HingeConstants.kHingeV, Constants.HingeConstants.kHingeA);
@@ -78,30 +86,42 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
     @Override
     protected double getMeasurement() {
-        return getAbsolteAngle();
+        return getAbsoluteAngle();
     }
+
 
     @Override
     public void periodic() {
         super.periodic();
-        checkLimits();
+        //checkLimits();
 
         getController().setP(SmartDashboard.getNumber("kP", Constants.HingeConstants.kHingeP));
         getController().setI(SmartDashboard.getNumber("kI", Constants.HingeConstants.kHingeI));
         getController().setD(SmartDashboard.getNumber("kD", Constants.HingeConstants.kHingeD));
+
+        Crashboard.toDashboard("Left Motor Encoder", hingeLeader.getEncoder().getPosition(), "Hinge");
+        Crashboard.toDashboard("Right Motor Encoder", hingeLeader.getEncoder().getPosition(), "Hinge");
+        Crashboard.toDashboard("AbsoluteEncoderPositon", getAbsoluteAngle(), "Hinge");
+        Crashboard.toDashboard("AbsoluteEncoderAngle", getAbsoluteDegrees(), "Hinge");
+
     }
 
-    public void checkLimits() {
-        if (getAbsolteAngle() > Constants.HingeConstants.kMaxAngle || getAbsolteAngle() < Constants.HingeConstants.kMinAngle) {
-            stop();
-        }
+    // public void checkLimits() {
+    //     if (getAbsoluteAngle() > Constants.HingeConstants.kMaxAngle || getAbsoluteAngle() < Constants.HingeConstants.kMinAngle) {
+    //         stop();
+    //     }
+    // }
+
+    public void resetRelativeEncoders() {
+        hingeLeaderRelativeEncoder.setPosition(0);
+        hingeFollowerRelativeEncoder.setPosition(0);
     }
 
     public void stop() {
         hingeLeader.stopMotor();
     }
 
-    public double getAbsolteAngle() {
+    public double getAbsoluteAngle() {
         return (encoder.getAbsolutePosition());
     }
 
@@ -116,7 +136,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     }
 
     public boolean isAtPosition(double setpoint, double deadzone) {
-        if (getAbsolteAngle() <= (setpoint + deadzone) || getAbsolteAngle() >= (setpoint - deadzone)) {
+        if (getAbsoluteAngle() <= (setpoint + deadzone) || getAbsoluteAngle() >= (setpoint - deadzone)) {
             return true;
         }
         else {
@@ -125,7 +145,33 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     }
 
     public double getAbsoluteDegrees() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAbsoluteDegrees'");
+        //return ((.87 - encoder.getAbsolutePosition())/.26) * (72) + (60);
+        return parseRawAbsEncoderValue(encoder.getAbsolutePosition(), 
+            Constants.HingeConstants.rawEncoderLow, 
+            Constants.HingeConstants.rawEncoderHigh, 
+            Constants.HingeConstants.degreesLow, 
+            Constants.HingeConstants.degreesHigh);
+    }
+    public double parseRawAbsEncoderValue(double rawAbsoluteEncoderValue, double rawEncoderLow, double rawEncoderHigh, double degreesLow, double degreesHigh) {
+       
+        return (rawAbsoluteEncoderValue-rawEncoderLow)/(rawEncoderHigh-rawEncoderLow)*(degreesHigh-degreesLow)+degreesLow;
+
+    }
+
+    public void SetRelativeEncoderSoftLimits(float lowerLimit, float upperLimit){
+
+        hingeLeader.setSoftLimit(SoftLimitDirection.kForward, upperLimit);
+        hingeFollower.setSoftLimit(SoftLimitDirection.kForward, upperLimit);
+        
+        hingeLeader.enableSoftLimit(SoftLimitDirection.kForward, true);
+        hingeFollower.enableSoftLimit(SoftLimitDirection.kForward, true);
+
+
+        hingeLeader.setSoftLimit(SoftLimitDirection.kReverse, lowerLimit);
+        hingeFollower.setSoftLimit(SoftLimitDirection.kReverse, lowerLimit);
+
+        hingeLeader.enableSoftLimit(SoftLimitDirection.kReverse, true);
+        hingeFollower.enableSoftLimit(SoftLimitDirection.kReverse, true);
+
     }
 }

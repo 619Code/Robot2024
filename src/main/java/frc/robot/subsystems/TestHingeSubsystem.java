@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,6 +17,8 @@ public class TestHingeSubsystem extends SubsystemBase {
     private CANSparkMax hingeFollower;
 
     private DutyCycleEncoder encoder;
+    private RelativeEncoder hingeLeaderRelativeEncoder;     
+    private RelativeEncoder hingeFollowerRelativeEncoder;
 
     public TestHingeSubsystem() {
         //left motor
@@ -31,15 +35,17 @@ public class TestHingeSubsystem extends SubsystemBase {
         hingeFollower.setIdleMode(IdleMode.kCoast);
         hingeFollower.setSmartCurrentLimit(35);
         hingeFollower.setInverted(Constants.HingeConstants.kHingeFollowerInverted);
-        //hingeFollower.getEncoder().setInverted(true);
 
-        // encoder = new CANcoder(Constants.HingeConstants.kAbsoluteEncoderPort);
-
+        hingeLeaderRelativeEncoder = hingeLeader.getEncoder();
+        hingeFollowerRelativeEncoder = hingeFollower.getEncoder();
+    
         //hingeFollower.follow(hingeLeader);
         encoder = new DutyCycleEncoder(Constants.HingeConstants.kAbsoluteEncoderPort);
         encoder.setDistancePerRotation(360.0);
         encoder.setPositionOffset(Constants.HingeConstants.kAbsoluteEncoderOffset);
     }
+
+
 
     @Override 
     public void periodic() {
@@ -60,11 +66,43 @@ public class TestHingeSubsystem extends SubsystemBase {
         hingeFollower.stopMotor();
     }
     
+
+    public void resetRelativeEncoders() {
+        hingeLeaderRelativeEncoder.setPosition(0);
+        hingeFollowerRelativeEncoder.setPosition(0);
+    }
+    
     public double getAbsoluteAngle() {
         return (encoder.getAbsolutePosition());
     }
-
     public double getAbsoluteDegrees() {
-        return ((.87 - encoder.getAbsolutePosition())/.26) * (72) + (60);
+        //return ((.87 - encoder.getAbsolutePosition())/.26) * (72) + (60);
+        return parseRawAbsEncoderValue(encoder.getAbsolutePosition(), 
+            Constants.HingeConstants.rawEncoderLow, 
+            Constants.HingeConstants.rawEncoderHigh, 
+            Constants.HingeConstants.degreesLow, 
+            Constants.HingeConstants.degreesHigh);
+    }
+    public double parseRawAbsEncoderValue(double rawAbsoluteEncoderValue, double rawEncoderLow, double rawEncoderHigh, double degreesLow, double degreesHigh) {
+       
+        return (rawAbsoluteEncoderValue-rawEncoderLow)/(rawEncoderHigh-rawEncoderLow)*(degreesHigh-degreesLow)+degreesLow;
+
+    }
+
+    public void SetRelativeEncoderSoftLimits(float lowerLimit, float upperLimit){
+
+        hingeLeader.setSoftLimit(SoftLimitDirection.kForward, upperLimit);
+        hingeFollower.setSoftLimit(SoftLimitDirection.kForward, upperLimit);
+        
+        hingeLeader.enableSoftLimit(SoftLimitDirection.kForward, true);
+        hingeFollower.enableSoftLimit(SoftLimitDirection.kForward, true);
+
+
+        hingeLeader.setSoftLimit(SoftLimitDirection.kReverse, lowerLimit);
+        hingeFollower.setSoftLimit(SoftLimitDirection.kReverse, lowerLimit);
+
+        hingeLeader.enableSoftLimit(SoftLimitDirection.kReverse, true);
+        hingeFollower.enableSoftLimit(SoftLimitDirection.kReverse, true);
+
     }
 }
