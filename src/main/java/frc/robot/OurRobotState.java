@@ -1,5 +1,5 @@
 package frc.robot;
 
 public class OurRobotState {
-    public static final boolean ArmInitialized = false;
+    public static boolean ArmInitialized = false;
 }
