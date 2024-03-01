@@ -9,6 +9,56 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
+    public static final class ManipulatorConstants {
+        public static final int kIntakeLeaderPort = -1;
+        public static final boolean kInakeLeaderInverted = false;
+        public static final int kShooterLeaderPort = -1;
+        public static final boolean kShooterLeaderInverted = false;
+
+        public static final double intakeSpeed = -0.05;
+        public static final double outtakeSpeed = -0.05;
+
+        public static final int kIntakeSensorPort = -1;
+        public static final int kMiddleSensorPort = -1;
+        
+    }
+
+    public static final class HingeConstants {
+        public static final int kHingeLeaderPort = 52; // left motor
+        public static final int kHingeFollowerPort = 61; // right motor
+        public static final boolean kHingeLeaderInverted = false;
+        public static final boolean kHingeFollowerInverted = true;
+
+        public static final int kAbsoluteEncoderPort = 0;
+        public static final int kAbsoluteEncoderOffset = 0;
+        public static final double kMaxAngle = 128; //TEMP VALUE
+        public static final double kMinAngle = 60; //TEMP VALUE
+
+        public static final float topEncoderSoftLimit = 73;
+        public static final float bottomEncoderSoftLimit = -0.01f;
+        
+        public static final double kHingeP = 0.27; //UNTUNED
+        public static final double kHingeI = 0; //UNTUNED
+        public static final double kHingeD = 0; //UNTUNED
+        public static final double kHingeG = .14; //TEMP VALUE NEEDS TUNING
+        public static final double kHingeV = 5.35; //TEMP VALUE NEEDS TUNING
+        public static final double kHingeA = 0.0; //TEMP VALUE NEEDS TUNING
+        public static final double kHingeS = 0.0;//TEMP VALUE NEEDS TUNING
+
+        public static final double kHingeMaxVelocityRadPerSecond = 0;
+        public static final double KHingeMaxAccelerationRadPerSecond = 0;
+
+        public static final double kIntakeAngle = 108.4;
+        public static final double kShootingAngle = 65;
+        public static final double kAmpAngle = 127.5;
+
+        public static final double rawEncoderLow = .88;
+        public static final double rawEncoderHigh = .617;
+        public static final double degreesLow = 60;
+        public static final double degreesHigh = 128;
+
+        }
+
   public static final int CANdleid = 20;
     public static final class ModuleConstants {
         // these constants should be correct for the current 4ki module we are using 
