@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.OurRobotState;
+import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.HingeSubsystem;
 
 public class GoToShootPosCommand extends Command {
@@ -18,6 +20,7 @@ public class GoToShootPosCommand extends Command {
         subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
         subsystem.enable();
         System.out.println("I am initialize");
+        OurRobotState.currentArmPosition = ArmPosEnum.SPEAKER;
     }
 
     @Override

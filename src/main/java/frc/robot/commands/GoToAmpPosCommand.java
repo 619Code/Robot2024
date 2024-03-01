@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.OurRobotState;
+import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.HingeSubsystem;
 
 public class GoToAmpPosCommand extends Command {
@@ -17,6 +19,7 @@ public class GoToAmpPosCommand extends Command {
     public void initialize() {
         subsystem.setGoal(Constants.HingeConstants.kAmpAngle);
         subsystem.enable();
+        OurRobotState.currentArmPosition = ArmPosEnum.AMP;
     }
 
     @Override

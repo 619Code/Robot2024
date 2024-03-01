@@ -1,9 +1,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.OurRobotState;
+import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.ManipulatorSubsystem;
 
-public class ShootCommand extends Command{
+public class ShootCommand extends Command {
 
     private ManipulatorSubsystem subsystem;
     private boolean hasReachedVelocity = false;
@@ -12,20 +15,35 @@ public class ShootCommand extends Command{
     private double intakeSpeed;
     private int  RPMsRequiredForOuttake;
     
-    public ShootCommand(ManipulatorSubsystem subsystem, double _outtakeSpeed, double _intakeSpeed, int _RPMsRequiredForOuttake) {
+    public ShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
-
-        this.outtakeSpeed = _outtakeSpeed;
-        this.intakeSpeed = _intakeSpeed;
-        this.RPMsRequiredForOuttake = _RPMsRequiredForOuttake;
 
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
+        if (OurRobotState.currentArmPosition == ArmPosEnum.AMP) {
+
+            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedAmp;
+            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
+            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote;
+
+        } else if (OurRobotState.currentArmPosition == ArmPosEnum.SPEAKER) {
+
+            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeaker;
+            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
+            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
+
+        } else {
+            // do nothing, no shooting!
+                // Shooter, no shooting!
+            this.outtakeSpeed = 0;
+            this.intakeSpeed = 0;
+            this.RPMsRequiredForOuttake = 0;
+        }
+
         subsystem.spinShooter(this.outtakeSpeed); // test value, make sure to change once we g
-      //  subsystem.spintake(Constants.ManipulatorConstants.intakeSpeedWhenOuttaking);
     }
 
     @Override

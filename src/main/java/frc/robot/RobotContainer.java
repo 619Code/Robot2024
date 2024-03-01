@@ -42,9 +42,9 @@ public class RobotContainer {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    private final boolean enableDrivetrain  = true;
-    private final boolean enableHinge       = false;
-    private final boolean enableManipulator = false;
+    private final boolean enableDrivetrain  = false;
+    private final boolean enableHinge       = true;
+    private final boolean enableManipulator = true;
     private final boolean enableClimb       = false;
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -74,34 +74,41 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
 
-        //  =========   MANIPULATOR BINDINGS   =========
+        if (enableDrivetrain) {
+            swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+        }
 
-        //  Run intake command on {y} press
-        Trigger intakeTrigger = operatorController.y();
-        intakeTrigger.onTrue(new IntakeCommand(manipulatorSubsystem));
-        // Stop manipulator {y} lift
-        intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+        if (enableHinge) {
+            hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
+                
+            operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
+            operatorController.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
 
-        //  Run shoot speaker command on {a} press
-        Trigger shootSpeakerTrigger = operatorController.a();
-        shootSpeakerTrigger.onTrue(new ShootCommand(manipulatorSubsystem, Constants.ManipulatorConstants.outtakeSpeedSpeaker, Constants.ManipulatorConstants.intakeSpeedWhenOuttaking, Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote));
-        // Stop manipulator on {a} lift
-        shootSpeakerTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+            operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
+            operatorController.b().whileTrue(new TestHingeCommand(hingeSubsystem, operatorController));
+        }
 
-        //  Run shoot amp command on {b} press
-        Trigger shootAmpTrigger = operatorController.b();
-        shootAmpTrigger.onTrue(new ShootCommand(manipulatorSubsystem, Constants.ManipulatorConstants.outtakeSpeedAmp, Constants.ManipulatorConstants.intakeSpeedWhenOuttaking, Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote));
-        // Stop manipulator on {a} lift
-        shootAmpTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+        if (enableManipulator) {
+            //  =========   MANIPULATOR BINDINGS   =========
+            Trigger shooTrigger = operatorController.leftTrigger();
+            shooTrigger.onTrue(new ShootCommand(manipulatorSubsystem));
+            shooTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+
+            Trigger intakeTrigger = operatorController.y();
+            intakeTrigger.onTrue(new IntakeCommand(manipulatorSubsystem));
+            intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+
+        }
+
+        if (enableClimb) {
+            //
+        }
+
+        
 
 
         //   =========   OTHER BINDINGS   =========
 
-        operatorController.a().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-        operatorController.y().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
-
-        operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
-        operatorController.b().whileTrue(new TestHingeCommand(hingeSubsystem, operatorController));
     
     }
 
