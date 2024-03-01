@@ -9,20 +9,6 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
-    public static final class ManipulatorConstants {
-        public static final int kIntakeLeaderPort = -1;
-        public static final boolean kInakeLeaderInverted = false;
-        public static final int kShooterLeaderPort = -1;
-        public static final boolean kShooterLeaderInverted = false;
-
-        public static final double intakeSpeed = -0.05;
-        public static final double outtakeSpeed = -0.05;
-
-        public static final int kIntakeSensorPort = -1;
-        public static final int kMiddleSensorPort = -1;
-        
-    }
-
     public static final class HingeConstants {
         public static final int kHingeLeaderPort = 52; // left motor
         public static final int kHingeFollowerPort = 61; // right motor
@@ -195,5 +181,23 @@ public final class Constants {
 
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7;
+    }
+
+    public static final class ManipulatorConstants {
+        public static final int kIntakeLeaderPort = 60;  //20;  Test bed  value
+        public static final boolean kInakeLeaderInverted = false;
+        public static final int kShooterLeaderPort = 54; //10; TEst bed value
+        public static final boolean kShooterLeaderInverted = true;
+
+        public static final double intakeSpeed = 0.3;
+        public static final double intakeSpeedWhenOuttaking = 0.6;
+        public static final double outtakeSpeedSpeaker = 0.7;
+        public static final double outtakeSpeedAmp = 0.7;
+
+        public static final int kIntakeSensorPort = 9;  //0f test bed value
+
+        public static final int speakerShooterVelocityToReachBeforeFeedingNote = 3000;
+        public static final int ampShooterVelocityToReachBeforeFeedingNote = 1500;
+        
     }
 } 

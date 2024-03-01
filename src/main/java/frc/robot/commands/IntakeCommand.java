@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.ManipulatorSubsystem;
 
 public class IntakeCommand extends Command{
@@ -15,7 +16,13 @@ public class IntakeCommand extends Command{
 
     @Override
     public void initialize() {
-        subsystem.spintake(-.05); // test value plz change
+        subsystem.spintake(Constants.ManipulatorConstants.intakeSpeed); // test value plz change. NO! I WON'T!
+    }
+
+    @Override
+    public boolean isFinished() {
+        System.out.println(subsystem.intakeTrigged());
+        return subsystem.intakeTrigged(); 
     }
 
     @Override

@@ -1,12 +1,14 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.helpers.Crashboard;
 
 public class ManipulatorSubsystem extends SubsystemBase {
 
@@ -14,7 +16,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public final CANSparkMax shooterLeader;
 
     public final DigitalInput intakeProximitySensor;
-    public final DigitalInput middleProximitySensor;
+
+    public final RelativeEncoder shooterEncoder;
 
     public ManipulatorSubsystem() {
         intakeLeader = new CANSparkMax(Constants.ManipulatorConstants.kIntakeLeaderPort, MotorType.kBrushless);
@@ -27,11 +30,26 @@ public class ManipulatorSubsystem extends SubsystemBase {
         shooterLeader.restoreFactoryDefaults();
         shooterLeader.setIdleMode(IdleMode.kBrake);        
         shooterLeader.setSmartCurrentLimit(35);
-        shooterLeader.setInverted(Constants.ManipulatorConstants.kInakeLeaderInverted);
+        shooterLeader.setInverted(Constants.ManipulatorConstants.kShooterLeaderInverted);
 
         intakeProximitySensor = new DigitalInput(Constants.ManipulatorConstants.kIntakeSensorPort);
-        middleProximitySensor = new DigitalInput(Constants.ManipulatorConstants.kMiddleSensorPort);
 
+        shooterEncoder = this.shooterLeader.getEncoder();
+
+    }
+
+    @Override
+    public void periodic() {
+        
+        Crashboard.toDashboard("Sensor value: ", intakeProximitySensor.get(), "Manipulator");
+
+        
+
+    }
+
+    public double GetShooterVelocity(){
+
+        return shooterEncoder.getVelocity();
 
     }
 
@@ -44,27 +62,19 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
 
     public boolean intakeTrigged() {
-        return intakeProximitySensor.get();
-    }
-
-    public boolean middleTriggered() {
-        return middleProximitySensor.get();
+        return !intakeProximitySensor.get();
     }
 
     public void stopIntake(){
-        intakeLeader.stopMotor();;
+        intakeLeader.stopMotor();
     }
 
     public void stopShooter(){
-        shooterLeader.stopMotor();;
+        shooterLeader.stopMotor();
     }
 
     public void stopAll(){
         intakeLeader.stopMotor();
         shooterLeader.stopMotor();
-    }
-
-
-    
-    
+    }  
 }
