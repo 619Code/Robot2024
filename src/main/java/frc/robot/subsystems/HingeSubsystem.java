@@ -78,10 +78,14 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
     @Override
     protected void useOutput(double output, State setpoint) {
-        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
+        //double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
 
-        hingeLeader.setVoltage(output + feedforward);
-        hingeFollower.setVoltage(output + feedforward);
+        //System.out.println("Howdy! useOutput was successfully called. >:3c");
+        System.out.println(output + " :3");
+
+        Crashboard.toDashboard("Motor Voltage", output, "Hinge");
+        hingeLeader.setVoltage(output);
+        hingeFollower.setVoltage(output);
     }
 
     @Override
@@ -95,9 +99,9 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         super.periodic();
         //checkLimits();
 
-        getController().setP(SmartDashboard.getNumber("kP", Constants.HingeConstants.kHingeP));
-        getController().setI(SmartDashboard.getNumber("kI", Constants.HingeConstants.kHingeI));
-        getController().setD(SmartDashboard.getNumber("kD", Constants.HingeConstants.kHingeD));
+        //getController().setP(SmartDashboard.getNumber("kP-Hinge", Constants.HingeConstants.kHingeP));
+        //getController().setI(SmartDashboard.getNumber("kI-Hinge", Constants.HingeConstants.kHingeI));
+        //getController().setD(SmartDashboard.getNumber("kD-Hinge", Constants.HingeConstants.kHingeD));
 
         Crashboard.toDashboard("Leader Encoder", hingeLeader.getEncoder().getPosition(), "Hinge");
         Crashboard.toDashboard("Follower Encoder", hingeFollower.getEncoder().getPosition(), "Hinge");

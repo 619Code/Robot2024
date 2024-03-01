@@ -37,7 +37,7 @@ public final class Constants {
         public static final float topEncoderSoftLimit = 73;
         public static final float bottomEncoderSoftLimit = -0.01f;
         
-        public static final double kHingeP = 0; //UNTUNED
+        public static final double kHingeP = 0.27; //UNTUNED
         public static final double kHingeI = 0; //UNTUNED
         public static final double kHingeD = 0; //UNTUNED
         public static final double kHingeG = .14; //TEMP VALUE NEEDS TUNING
@@ -48,9 +48,9 @@ public final class Constants {
         public static final double kHingeMaxVelocityRadPerSecond = 0;
         public static final double KHingeMaxAccelerationRadPerSecond = 0;
 
-        public static final double kIntakeAngle = 100;
-        public static final double kShootingAngle = 60;
-        public static final double kAmpAngle = 120;
+        public static final double kIntakeAngle = 108.4;
+        public static final double kShootingAngle = 65;
+        public static final double kAmpAngle = 127.5;
 
         public static final double rawEncoderLow = .88;
         public static final double rawEncoderHigh = .617;

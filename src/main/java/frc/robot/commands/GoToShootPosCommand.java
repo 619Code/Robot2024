@@ -17,6 +17,13 @@ public class GoToShootPosCommand extends Command {
     public void initialize() {
         subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
         subsystem.enable();
+        System.out.println("I am initialize");
+    }
+
+    @Override
+    public void execute() {
+        subsystem.enable();
+        System.out.println("I am execute");
     }
 
     @Override
