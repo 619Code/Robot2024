@@ -1,20 +1,14 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-<<<<<<< HEAD
 import com.revrobotics.RelativeEncoder;
-=======
->>>>>>> main
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-<<<<<<< HEAD
 import frc.robot.helpers.Crashboard;
-=======
->>>>>>> main
 
 public class ManipulatorSubsystem extends SubsystemBase {
 
@@ -22,12 +16,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public final CANSparkMax shooterLeader;
 
     public final DigitalInput intakeProximitySensor;
-<<<<<<< HEAD
 
     public final RelativeEncoder shooterEncoder;
-=======
-    public final DigitalInput middleProximitySensor;
->>>>>>> main
 
     public ManipulatorSubsystem() {
         intakeLeader = new CANSparkMax(Constants.ManipulatorConstants.kIntakeLeaderPort, MotorType.kBrushless);
@@ -40,7 +30,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
         shooterLeader.restoreFactoryDefaults();
         shooterLeader.setIdleMode(IdleMode.kBrake);        
         shooterLeader.setSmartCurrentLimit(35);
-<<<<<<< HEAD
         shooterLeader.setInverted(Constants.ManipulatorConstants.kShooterLeaderInverted);
 
         intakeProximitySensor = new DigitalInput(Constants.ManipulatorConstants.kIntakeSensorPort);
@@ -61,13 +50,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public double GetShooterVelocity(){
 
         return shooterEncoder.getVelocity();
-=======
-        shooterLeader.setInverted(Constants.ManipulatorConstants.kInakeLeaderInverted);
-
-        intakeProximitySensor = new DigitalInput(Constants.ManipulatorConstants.kIntakeSensorPort);
-        middleProximitySensor = new DigitalInput(Constants.ManipulatorConstants.kMiddleSensorPort);
-
->>>>>>> main
 
     }
 
@@ -80,7 +62,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
 
     public boolean intakeTrigged() {
-<<<<<<< HEAD
         return !intakeProximitySensor.get();
     }
 
@@ -90,34 +71,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
     public void stopShooter(){
         shooterLeader.stopMotor();
-=======
-        return intakeProximitySensor.get();
-    }
-
-    public boolean middleTriggered() {
-        return middleProximitySensor.get();
-    }
-
-    public void stopIntake(){
-        intakeLeader.stopMotor();;
-    }
-
-    public void stopShooter(){
-        shooterLeader.stopMotor();;
->>>>>>> main
     }
 
     public void stopAll(){
         intakeLeader.stopMotor();
         shooterLeader.stopMotor();
-<<<<<<< HEAD
     }  
 }
-=======
-    }
-
-
-    
-    
-}
->>>>>>> main

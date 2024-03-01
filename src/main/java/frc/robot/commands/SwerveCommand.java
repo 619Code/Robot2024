@@ -27,11 +27,7 @@ public class SwerveCommand extends Command {
 
     private SlewRateLimiter driveLimiter, driveLimiterX, driveLimiterY, turnLimiter;
 
-<<<<<<< HEAD
-    public SwerveCommand(SwerveSubsystem swerveSubsystem, CommandXboxController controller) {
-=======
     public SwerveCommand(SwerveSubsystem swerveSubsystem, CommandXboxController driverOne) {
->>>>>>> main
         this.swerveSubsystem = swerveSubsystem;
         this.controller = driverOne;
         addRequirements(swerveSubsystem);
