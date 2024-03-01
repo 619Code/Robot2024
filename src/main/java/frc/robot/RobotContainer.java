@@ -24,21 +24,40 @@ public class RobotContainer {
     private final CommandXboxController driverOne = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    public RobotContainer() {
-        //swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
         
-       // new HingeInitializeCommand(hingeSubsystem).execute();
 
-    //    Commands.runOnce(() -> new HingeInitializeCommand(hingeSubsystem));
-        //.andThen(() -> hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem)));
+    //////////////////////////////////////////////////////////////////////////////////////
 
-        // Commands.runOnce(new HingeInitializeCommand(hingeSubsystem)).andThen(() -> {
-        //    hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem)); 
-        // });
+    //                         SUBSYSTEM ENABLE/DISABLE CONTROLS                        //
 
-        hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
+    //////////////////////////////////////////////////////////////////////////////////////
 
-        //hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
+    private final boolean enableDrivetrain  = true;
+    private final boolean enableHinge       = false;
+    private final boolean enableManipulator = false;
+    private final boolean enableClimb       = false;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+
+    public RobotContainer() {
+
+        if (enableDrivetrain) {
+            swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+        }
+
+        if (enableHinge) {
+            hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
+        }
+
+        if (enableManipulator) {
+            //
+        }
+
+        if (enableClimb) {
+            //
+        }
 
         configureButtonBindings();
     }
