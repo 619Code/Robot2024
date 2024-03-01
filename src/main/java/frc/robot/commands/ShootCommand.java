@@ -6,6 +6,7 @@ import frc.robot.subsystems.ManipulatorSubsystem;
 public class ShootCommand extends Command{
 
     private ManipulatorSubsystem subsystem;
+<<<<<<< HEAD
     private boolean hasReachedVelocity = false;
 
     private double outtakeSpeed;
@@ -19,11 +20,18 @@ public class ShootCommand extends Command{
         this.intakeSpeed = _intakeSpeed;
         this.RPMsRequiredForOuttake = _RPMsRequiredForOuttake;
 
+=======
+    
+    public ShootCommand(ManipulatorSubsystem subsystem) {
+        this.subsystem = subsystem;
+
+>>>>>>> main
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
+<<<<<<< HEAD
         subsystem.spinShooter(this.outtakeSpeed); // test value, make sure to change once we g
       //  subsystem.spintake(Constants.ManipulatorConstants.intakeSpeedWhenOuttaking);
     }
@@ -46,12 +54,21 @@ public class ShootCommand extends Command{
     @Override
     public boolean isFinished() {
         return false; 
+=======
+        subsystem.spinShooter(.05); // test value, make sure to change once we g
+>>>>>>> main
     }
 
     @Override
     public void end(boolean interrupted) {
+<<<<<<< HEAD
         hasReachedVelocity = false;
         subsystem.stopShooter();
         subsystem.stopIntake();
     }
 }
+=======
+        subsystem.stopShooter();
+    }
+}
+>>>>>>> main
