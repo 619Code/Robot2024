@@ -94,7 +94,7 @@ public final class Constants {
         public static final boolean kFrontLeftTurningMotorReversed = true; //updated 
         public static final int kFrontLeftDriveAbsoluteEncoderPort = 30; //updated
         public static final boolean kFrontLeftDriveAbsoluteEncoderReversed = false; //updated
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetDeg = -1; //updated, in degrees // they want this to be the negative of the reported values?
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetDeg = -0.45; //updated // they want this to be the negative of the reported values?
         public static final SensorDirectionValue kFrontLeftTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         //we need to updats these motors
@@ -106,7 +106,7 @@ public final class Constants {
         public static final boolean kFrontRightTurningMotorReversed = true; //updated
         public static final int kFrontRightDriveAbsoluteEncoderPort = 33; //updated
         public static final boolean kFrontRightDriveAbsoluteEncoderReversed = false; //updated
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetDeg = -1; //updated, in degrees
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetDeg = -0.478; //updated, in degrees
         public static final SensorDirectionValue kFrontRightTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         //we need to update these motors
@@ -118,7 +118,7 @@ public final class Constants {
         public static final boolean kBackLeftTurningMotorReversed = true; //updated
         public static final int kBackLeftDriveAbsoluteEncoderPort = 31; //updated
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false; //updated
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetDeg = -1; //updated, in degrees
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetDeg = 0.435; //updated, in degrees
         public static final SensorDirectionValue kBackLeftTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         //we need to update these motors
@@ -130,7 +130,7 @@ public final class Constants {
         public static final boolean kBackRightTurningMotorReversed = true; //updated
         public static final int kBackRightDriveAbsoluteEncoderPort = 32; //updated
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false; //updated
-        public static final double kBackRightDriveAbsoluteEncoderOffsetDeg = -1; //updated, in degrees
+        public static final double kBackRightDriveAbsoluteEncoderOffsetDeg = -0.306; //updated, in degrees
         public static final SensorDirectionValue kBackRightTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         
