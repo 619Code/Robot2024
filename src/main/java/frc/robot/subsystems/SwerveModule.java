@@ -151,5 +151,8 @@ public class SwerveModule {
 
     public void logIt() {
       Crashboard.toDashboard(ModuleName + " Wheel Angle", this.getAbsoluteEncoderDeg(), "swerve");
+      Crashboard.toDashboard(ModuleName + " Abs. Enc.", this.absoluteEncoder.getAbsolutePosition().getValueAsDouble(), "swerve");
+      //Crashboard.toDashboard(ModuleName  + " Encoder Value Drive", this.driveMotor.getEncoder().getPosition(), "swerve");
+      Crashboard.toDashboard(ModuleName  + " Deg. Turn", this.turningMotor.getEncoder().getPosition(), "swerve");
     }
 }

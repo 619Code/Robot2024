@@ -60,7 +60,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
         hingeFollower = new CANSparkMax(Constants.HingeConstants.kHingeFollowerPort, MotorType.kBrushless);
         hingeFollower.restoreFactoryDefaults();
-        hingeFollower.setIdleMode(IdleMode.kCoast);
+        hingeFollower.setIdleMode(IdleMode.kBrake);
         hingeFollower.setSmartCurrentLimit(35);
         hingeFollower.setInverted(Constants.HingeConstants.kHingeFollowerInverted);
 
