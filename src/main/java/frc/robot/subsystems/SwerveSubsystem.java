@@ -194,5 +194,17 @@ public class SwerveSubsystem extends SubsystemBase {
         }, getPose2d());
     }
 
+    public void reorientMidMatch() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                zeroHeading();
+            } 
+            catch (Exception e) {
+            }
+        }).start();
+    }
+    
+
     
 }

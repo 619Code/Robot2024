@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -28,7 +29,7 @@ public class RobotContainer {
     //private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     //private final TestHingeSubsystem testHingeSubsystem = new TestHingeSubsystem();
     private final HingeSubsystem hingeSubsystem = new HingeSubsystem();
-    private final CommandXboxController driverOne = new CommandXboxController(0);
+    private final Joystick driverOne = new Joystick(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
 
@@ -43,8 +44,8 @@ public class RobotContainer {
     //////////////////////////////////////////////////////////////////////////////////////
 
     public static final boolean enableDrivetrain  = true;
-    public static final boolean enableHinge       = false;
-    public static final boolean enableManipulator = false;
+    public static final boolean enableHinge       = true;
+    public static final boolean enableManipulator = true;
     public static final boolean enableClimb       = false;
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +77,9 @@ public class RobotContainer {
 
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+
+            
+
         }
 
         if (enableHinge) {

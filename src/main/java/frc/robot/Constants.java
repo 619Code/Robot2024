@@ -35,7 +35,7 @@ public final class Constants {
         public static final double KHingeMaxAccelerationRadPerSecond = 0;
 
         public static final double kIntakeAngle = 108.4;
-        public static final double kShootingAngle = 65;
+        public static final double kShootingAngle = Constants.HingeConstants.kMinAngle;
         public static final double kAmpAngle = 127.5;
 
         public static final double rawEncoderLow = .88;
