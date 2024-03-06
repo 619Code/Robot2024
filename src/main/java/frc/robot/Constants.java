@@ -106,7 +106,7 @@ public final class Constants {
         public static final boolean kFrontRightTurningMotorReversed = true; //updated
         public static final int kFrontRightDriveAbsoluteEncoderPort = 30; //updated 
         public static final boolean kFrontRightDriveAbsoluteEncoderReversed = false; //updated
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetDeg = -0.287598; //updated, in degrees
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetDeg = -0.261475; //updated, in degrees
         public static final SensorDirectionValue kFrontRightTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         //we need to update these motors
