@@ -208,4 +208,11 @@ public final class Constants {
         public static final int kRightArmForwardPort = -1;
         public static final int kRightArmBackwardPort = -1;
     }
+
+    public static final class LEDConstants{
+        public static final int CANdleid = 40;
+        public static final int ledCount = 200;
+    }
+
+    
 } 
