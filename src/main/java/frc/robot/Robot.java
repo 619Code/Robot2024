@@ -78,7 +78,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    this.m_robotContainer.InitializeHinge();
+    if (RobotContainer.enableHinge) {
+      this.m_robotContainer.InitializeHinge();
+    }
   }
 
   /** This function is called periodically during operator control. */
