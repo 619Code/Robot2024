@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -6,10 +6,10 @@ import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.HingeSubsystem;
 
-public class GoToAmpPosCommand extends Command {
+public class GoToShootPosCommand extends Command {
     private HingeSubsystem subsystem;
 
-    public GoToAmpPosCommand(HingeSubsystem subsystem) {
+    public GoToShootPosCommand(HingeSubsystem subsystem) {
         this.subsystem = subsystem;
 
         addRequirements(subsystem);
@@ -17,9 +17,16 @@ public class GoToAmpPosCommand extends Command {
 
     @Override
     public void initialize() {
-        subsystem.setGoal(Constants.HingeConstants.kAmpAngle);
+        subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
         subsystem.enable();
-        OurRobotState.currentArmPosition = ArmPosEnum.AMP;
+        System.out.println("I am initialize");
+        OurRobotState.currentArmPosition = ArmPosEnum.SPEAKER;
+    }
+
+    @Override
+    public void execute() {
+        subsystem.enable();
+        System.out.println("I am execute");
     }
 
     @Override
@@ -29,7 +36,7 @@ public class GoToAmpPosCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        //return subsystem.isAtPosition(Constants.HingeConstants.kAmpAngle, 0 /*temp deadzone*/);
+        //return subsystem.isAtPosition(Constants.HingeConstants.kShootingAngle, 0 /*temp deadzone*/);
         return subsystem.getController().atGoal();
     }
 }

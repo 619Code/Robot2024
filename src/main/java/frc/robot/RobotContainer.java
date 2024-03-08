@@ -5,26 +5,24 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.SwerveCommand;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.SwerveCommand;
-import frc.robot.commands.TestHingeCommand;
+import frc.robot.commands.AutoCommands.AutoShootCommand;
+import frc.robot.commands.ClimbCommands.ClimbCommand;
+import frc.robot.commands.DrivetrainCommands.DriveToPointCommand;
+import frc.robot.commands.DrivetrainCommands.SwerveCommand;
+import frc.robot.commands.HingeCommands.HingeInitializeCommand;
+import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
+import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
+import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
+import frc.robot.commands.ShooterCommands.IntakeCommand;
+import frc.robot.commands.ShooterCommands.ShootCommand;
+import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
+import frc.robot.commands.Unused.TestHingeCommand;
 import frc.robot.helpers.AutoSelector;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.AutoShootCommand;
-import frc.robot.commands.ClimbCommand;
-import frc.robot.commands.DriveToPointCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.StopManipulatorCommand;
-
-import frc.robot.commands.GoToAmpPosCommand;
-import frc.robot.commands.GoToInakePosCommand;
-import frc.robot.commands.GoToShootPosCommand;
-import frc.robot.commands.HingeInitializeCommand;
 
 public class RobotContainer {
 

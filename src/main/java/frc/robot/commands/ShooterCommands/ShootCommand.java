@@ -1,13 +1,12 @@
-package frc.robot.commands;
+package frc.robot.commands.ShooterCommands;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.ManipulatorSubsystem;
- 
-public class AutoShootCommand extends Command {
+
+public class ShootCommand extends Command {
 
     private ManipulatorSubsystem subsystem;
     private boolean hasReachedVelocity = false;
@@ -15,12 +14,9 @@ public class AutoShootCommand extends Command {
     private double outtakeSpeed;
     private double intakeSpeed;
     private int  RPMsRequiredForOuttake;
-    private Timer timer;
     
-    public AutoShootCommand(ManipulatorSubsystem subsystem) {
+    public ShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
-        timer = new Timer();
-        timer.reset();
 
         addRequirements(subsystem);
     }
@@ -55,7 +51,6 @@ public class AutoShootCommand extends Command {
         if(subsystem.GetShooterVelocity() >= this.RPMsRequiredForOuttake){
 
             hasReachedVelocity = true;
-            timer.start();
 
         }
 
@@ -68,14 +63,7 @@ public class AutoShootCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        if (timer.hasElapsed(5)) {
-            timer.stop();
-            timer.reset();
-            return true;
-        }
-        else {
-            return false;
-        }
+        return false; 
     }
 
     @Override

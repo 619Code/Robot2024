@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.DrivetrainCommands;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
