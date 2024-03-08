@@ -165,6 +165,18 @@ public class RobotContainer {
         RIGHT WILL DO THE EXACT INVERSE OF LEFT.
         :3c
         */
+
+        // EMERGENCY AUTO! -------------------------------------------------------------------------------------------
+        
+        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+        //     new Rotation2d(0), 
+        //     new Rotation2d(0),
+        //     new Rotation2d(0),
+        //     new Rotation2d(0)}))
+        // .andThen( () -> swerveSubsystem.resetOdometry())
+        // .andThen(new AutoShootCommand(manipulatorSubsystem))
+        // ;
         
     }
 }

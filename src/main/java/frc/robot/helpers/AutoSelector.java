@@ -26,6 +26,7 @@ public class AutoSelector {
             if (angle < 0) {                            // SUBJECT TO CHANGE, INVERT IF NECESSARY!
                 return true;
             } else return false;
+
         } else {
             System.out.println("Missing Gyro. :(");
             return false;
