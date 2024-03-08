@@ -204,6 +204,10 @@ public class SwerveSubsystem extends SubsystemBase {
             }
         }).start();
     }
+
+    public AHRS getGyro() {
+        return gyro;
+    }
     
 
     

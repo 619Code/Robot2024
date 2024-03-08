@@ -202,10 +202,10 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int kLeftArmForwardPort = -1;
-        public static final int kLeftArmBackwardPort = -1;
+        public static final int kLeftArmForwardPort = 5;
+        public static final int kLeftArmBackwardPort = 4;
         
-        public static final int kRightArmForwardPort = -1;
-        public static final int kRightArmBackwardPort = -1;
+        public static final int kRightArmForwardPort = 3;
+        public static final int kRightArmBackwardPort = 2;
     }
 } 

@@ -10,10 +10,12 @@ import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.SwerveCommand;
 import frc.robot.commands.TestHingeCommand;
+import frc.robot.helpers.AutoSelector;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TestHingeSubsystem;
+import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveToPointCommand;
 import frc.robot.commands.IntakeCommand;
@@ -34,10 +36,7 @@ public class RobotContainer {
     private final Joystick driverOne = new Joystick(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-
-
 
         
 
@@ -47,15 +46,18 @@ public class RobotContainer {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    public static final boolean enableDrivetrain  = true;
-    public static final boolean enableHinge       = true;
-    public static final boolean enableManipulator = true;
-    public static final boolean enableClimb       = false;
+    public static final boolean enableDrivetrain  = false;
+    public static final boolean enableHinge       = false;
+    public static final boolean enableManipulator = false;
+    public static final boolean enableClimb       = true;
 
     //////////////////////////////////////////////////////////////////////////////////////
 
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
     public RobotContainer() {
+
+        AutoSelector.setGyro(swerveSubsystem.getGyro());
 
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
@@ -80,9 +82,6 @@ public class RobotContainer {
 
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
-
-            
-
         }
 
         if (enableHinge) {
@@ -109,26 +108,15 @@ public class RobotContainer {
 
         if (enableClimb) {
             Trigger climbTrigger = operatorController.back();
-            climbTrigger.onTrue(new ClimbCommand(climbSubsystem));
+            climbTrigger.toggleOnTrue(new ClimbCommand(climbSubsystem));
         }
-
         
-
-
         //   =========   OTHER BINDINGS   =========
-
     
     }
 
-    // public SwerveSubsystem getSwerve() {
-    //     return swerveSubsystem;
-    // }
-        
-        
-    
-
     public SwerveSubsystem getSwerve() {
-        return null;//swerveSubsystem;
+        return swerveSubsystem;
     }
 
     public void InitializeHinge() {
@@ -137,17 +125,46 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
 
-        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
-        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        // .andThen( () -> swerveSubsystem.resetOdometry())
-        // .andThen(new DriveToPointCommand(swerveSubsystem, -1, 2, 0.05))
-        // ;
+        return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+            new Rotation2d(0), 
+            new Rotation2d(0),
+            new Rotation2d(0),
+            new Rotation2d(0)}))
+        .andThen( () -> swerveSubsystem.resetOdometry())
+        .andThen(new AutoShootCommand(manipulatorSubsystem))
+        .andThen(Commands.either(
+            Commands.either(
+              new DriveToPointCommand(swerveSubsystem, 1, 2, 0.1) // Option 1 (A & B)    // LEFT
+            , new DriveToPointCommand(swerveSubsystem, 1, -2, 0.1) // Option 2 (!A & B)   //RIGHT
+            , () -> AutoSelector.isfacingLeft())         // Selector A, 1-2 // LEFT OR RIGHT (LEFT TRUE RIGHT FALSE)
+            , new DriveToPointCommand(swerveSubsystem, 3, 0, 0.1) // Option 3 (!(A|B) & C) //CENTER
+            , () -> AutoSelector.isFacingSide()         // Selector B, A-3 // SIDE OR CENTER (SIDE TRUE CENTER FALSE)
+            ))
+        ;
 
-        return null;
+        // PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK 
+
+        /*
+         WE ARE GOING TO ASSUME A CERTAIN ORIENTATION FOR THE SPEAKER.
+         IT SHOULD LOOK LIKE THIS.
+
+
+         /                     CENTER
+         |                     _____          |
+         |              LEFT  /     \ RIGHT   |
+         |------------------------------------|
+             me ☺
+
+        ALL AUTOS NEED TO:
+            - SHOOT
+            - TAXI
+        CENTER WILL TAXI STRAIGHT.
+        LEFT CAN TAXI STRAIGHT BUT SHOULD NOT.
+        LEFT WILL TAXI AT A 60 DEGREE ANGLE TO THE DRIVER STATION.
+        RIGHT WILL DO THE EXACT INVERSE OF LEFT.
+        :3c
+        */
         
     }
 }

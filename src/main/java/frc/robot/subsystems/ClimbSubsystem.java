@@ -11,8 +11,12 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public ClimbSubsystem() {
 
-        leftArm = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.ClimbConstants.kLeftArmForwardPort, Constants.ClimbConstants.kLeftArmBackwardPort);
-        rightArm = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.ClimbConstants.kRightArmForwardPort, Constants.ClimbConstants.kRightArmBackwardPort);
+        leftArm = new DoubleSolenoid(10, PneumaticsModuleType.REVPH, Constants.ClimbConstants.kLeftArmForwardPort, Constants.ClimbConstants.kLeftArmBackwardPort);
+        rightArm = new DoubleSolenoid(10, PneumaticsModuleType.REVPH, Constants.ClimbConstants.kRightArmForwardPort, Constants.ClimbConstants.kRightArmBackwardPort);
+
+
+        leftArm.set(DoubleSolenoid.Value.kReverse);
+        rightArm.set(DoubleSolenoid.Value.kReverse);
 
     }
 
@@ -22,5 +26,10 @@ public class ClimbSubsystem extends SubsystemBase {
         rightArm.toggle();
         
     }
+
+    @Override
+  public void periodic() {
+    System.out.println("First: " + leftArm.get() + ", Second: " + rightArm.get());
+  }
 
 }
