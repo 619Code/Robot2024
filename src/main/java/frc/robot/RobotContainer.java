@@ -43,9 +43,9 @@ public class RobotContainer {
     //////////////////////////////////////////////////////////////////////////////////////
 
     public static final boolean enableDrivetrain  = true;
-    public static final boolean enableHinge       = false;
-    public static final boolean enableManipulator = false;
-    public static final boolean enableClimb       = false;
+    public static final boolean enableHinge       = true;
+    public static final boolean enableManipulator = true;
+    public static final boolean enableClimb       = true;
 
     //////////////////////////////////////////////////////////////////////////////////////
 
