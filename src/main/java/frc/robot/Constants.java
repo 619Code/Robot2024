@@ -200,4 +200,12 @@ public final class Constants {
         public static final int ampShooterVelocityToReachBeforeFeedingNote = 1500;
         
     }
+
+    public static final class ClimbConstants {
+        public static final int kLeftArmForwardPort = -1;
+        public static final int kLeftArmBackwardPort = -1;
+        
+        public static final int kRightArmForwardPort = -1;
+        public static final int kRightArmBackwardPort = -1;
+    }
 } 

@@ -10,9 +10,11 @@ import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.SwerveCommand;
 import frc.robot.commands.TestHingeCommand;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TestHingeSubsystem;
+import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveToPointCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShootCommand;
@@ -32,6 +34,8 @@ public class RobotContainer {
     private final Joystick driverOne = new Joystick(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 
 
 
@@ -50,7 +54,6 @@ public class RobotContainer {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
     public RobotContainer() {
 
@@ -105,7 +108,8 @@ public class RobotContainer {
         }
 
         if (enableClimb) {
-            //
+            Trigger climbTrigger = operatorController.back();
+            climbTrigger.onTrue(new ClimbCommand(climbSubsystem));
         }
 
         
