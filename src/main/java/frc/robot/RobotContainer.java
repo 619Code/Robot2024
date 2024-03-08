@@ -14,14 +14,12 @@ import frc.robot.helpers.AutoSelector;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.TestHingeSubsystem;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveToPointCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.StopManipulatorCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController; // Can I do this?
 
 import frc.robot.commands.GoToAmpPosCommand;
 import frc.robot.commands.GoToInakePosCommand;
@@ -166,7 +164,7 @@ public class RobotContainer {
         :3c
         */
 
-        // EMERGENCY AUTO! -------------------------------------------------------------------------------------------
+        // EMERGENCY AUTO! SHOOT ONLY! -------------------------------------------------------------------------------------------
         
         // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
         // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
@@ -176,6 +174,18 @@ public class RobotContainer {
         //     new Rotation2d(0)}))
         // .andThen( () -> swerveSubsystem.resetOdometry())
         // .andThen(new AutoShootCommand(manipulatorSubsystem))
+        // ;
+
+        // EMERGENCY AUTO! DRIVE ONLY! -------------------------------------------------------------------------------------------
+        
+        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+        //     new Rotation2d(0), 
+        //     new Rotation2d(0),
+        //     new Rotation2d(0),
+        //     new Rotation2d(0)}))
+        // .andThen( () -> swerveSubsystem.resetOdometry())
+        // .andThen(new DriveToPointCommand(swerveSubsystem, -3, 0, 0.1))
         // ;
         
     }
