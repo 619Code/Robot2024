@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -145,6 +146,8 @@ public class SwerveSubsystem extends SubsystemBase {
         frontRight.logIt();
         backLeft.logIt();
         backRight.logIt();
+        Crashboard.toDashboard("PRE-MATCH ORIENTATION", (Math.abs(gyro.getAngle()) < 10), "Competition");           // Comp Orientation Check
+        Crashboard.toDashboard("DETERMINED POSITION", "" + AutoSelector.getLocation(), "Competition");
         Crashboard.toDashboard("gyro angle", gyro.getAngle(), "navx");
         publisher_current.set(getModuleStates(), 0);
         //System.out.println(getModuleStates()[1].speedMetersPerSecond);

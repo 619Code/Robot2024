@@ -33,4 +33,18 @@ public class AutoSelector {
         }
     }
 
+    public static AutoLocation getLocation() {
+        if (gyro != null) {
+            if (isFacingSide()) {
+                if (isfacingLeft()) {
+                    return AutoLocation.LEFT;
+                } else return AutoLocation.RIGHT;
+            } else return AutoLocation.CENTER;
+
+        } else {
+            System.out.println("Missing Gyro. :(");
+            return AutoLocation.NONE;
+        }
+    }
+
 }
