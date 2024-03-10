@@ -142,7 +142,7 @@ public final class Constants {
         public static final double kPhysicalMaxAngularSpeedDegreesPerSecond = 360; //2 * Math.PI; //kPhysicalMaxSpeedMetersPerSecond / Math.hypot(DriveConstants.kTrackWidth / 2.0, DriveConstants.kWheelBase / 2.0 * 3);
 
         //These are the variables that determine the max speeds of our swerve drive
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * (0.9); // Divide by 4 for slow testing. 
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * (1); // Divide by 4 for slow testing. 
         public static final double kTeleDriveMaxAngularSpeedDegreesPerSecond = kPhysicalMaxAngularSpeedDegreesPerSecond * (0.75);
         
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;

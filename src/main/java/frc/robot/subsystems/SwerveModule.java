@@ -117,7 +117,7 @@ public class SwerveModule {
         state.speedMetersPerSecond *= state.angle.minus(Rotation2d.fromDegrees(getAbsoluteEncoderDeg())).getCos();
         
         // Calculate the drive output from the drive PID controller. ;}
-        double driveSpeed = MathUtil.clamp(state.speedMetersPerSecond  / Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond/* / 360*/, -.75 ,.75);
+        double driveSpeed = MathUtil.clamp(state.speedMetersPerSecond  / Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond/* / 360*/, -.80 ,.80);
   
         driveMotor.set(driveSpeed);
         // Crashboard.toDashboard("driveSpeed", driveSpeed, "Swerve");
