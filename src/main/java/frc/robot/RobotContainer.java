@@ -12,6 +12,7 @@ import frc.robot.commands.ClimbCommands.ClimbCommand;
 import frc.robot.commands.DrivetrainCommands.DriveToPointCommand;
 import frc.robot.commands.DrivetrainCommands.SwerveCommand;
 import frc.robot.commands.HingeCommands.HingeInitializeCommand;
+import frc.robot.commands.ShooterCommands.ClimbWithArmCommand;
 import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
 import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
@@ -86,8 +87,12 @@ public class RobotContainer {
             operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
             operatorController.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
 
-            operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
+            //operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
             operatorController.b().whileTrue(new TestHingeCommand(hingeSubsystem, operatorController));
+
+            Trigger strongClimbTrigger = operatorController.x();
+            strongClimbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
+            
         }
 
         if (enableManipulator) {
@@ -105,6 +110,7 @@ public class RobotContainer {
         if (enableClimb) {
             Trigger climbTrigger = operatorController.back();
             climbTrigger.toggleOnTrue(new ClimbCommand(climbSubsystem));
+            //climbTrigger.toggleOnFalse(new ClimbCommand(climbSubsystem));
         }
         
         //   =========   OTHER BINDINGS   =========
@@ -121,23 +127,23 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
 
-        return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
-        .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-        .andThen( () -> swerveSubsystem.resetOdometry())
-        .andThen(new AutoShootCommand(manipulatorSubsystem))
-        .andThen(Commands.either(
-            Commands.either(
-              new DriveToPointCommand(swerveSubsystem, 1, 2, 0.1) // Option 1 (A & B)    // LEFT
-            , new DriveToPointCommand(swerveSubsystem, 1, -2, 0.1) // Option 2 (!A & B)   //RIGHT
-            , () -> AutoSelector.isfacingLeft())         // Selector A, 1-2 // LEFT OR RIGHT (LEFT TRUE RIGHT FALSE)
-            , new DriveToPointCommand(swerveSubsystem, 3, 0, 0.1) // Option 3 (!(A|B) & C) //CENTER
-            , () -> AutoSelector.isFacingSide()         // Selector B, A-3 // SIDE OR CENTER (SIDE TRUE CENTER FALSE)
-            ))
-        ;
+        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+        //     new Rotation2d(0), 
+        //     new Rotation2d(0),
+        //     new Rotation2d(0),
+        //     new Rotation2d(0)}))
+        // .andThen( () -> swerveSubsystem.resetOdometry())
+        // .andThen(new AutoShootCommand(manipulatorSubsystem))
+        // .andThen(Commands.either(
+        //     Commands.either(
+        //       new DriveToPointCommand(swerveSubsystem, -1, -2, 0.1) // Option 1 (A & B)    // LEFT
+        //     , new DriveToPointCommand(swerveSubsystem, -1, 2, 0.1) // Option 2 (!A & B)   //RIGHT
+        //     , () -> AutoSelector.isfacingLeft())         // Selector A, 1-2 // LEFT OR RIGHT (LEFT TRUE RIGHT FALSE)
+        //     , new DriveToPointCommand(swerveSubsystem, -3, 0, 0.1) // Option 3 (!(A|B) & C) //CENTER
+        //     , () -> AutoSelector.isFacingSide()         // Selector B, A-3 // SIDE OR CENTER (SIDE TRUE CENTER FALSE)
+        //     ))
+        // ;
 
         // PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK PLEASE WORK 
 
@@ -164,15 +170,15 @@ public class RobotContainer {
 
         // EMERGENCY AUTO! SHOOT ONLY! -------------------------------------------------------------------------------------------
         
-        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
-        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        // .andThen( () -> swerveSubsystem.resetOdometry())
-        // .andThen(new AutoShootCommand(manipulatorSubsystem))
-        // ;
+        return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
+        .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+            new Rotation2d(0), 
+            new Rotation2d(0),
+            new Rotation2d(0),
+            new Rotation2d(0)}))
+        .andThen( () -> swerveSubsystem.resetOdometry())
+        .andThen(new AutoShootCommand(manipulatorSubsystem))
+        ;
 
         // EMERGENCY AUTO! DRIVE ONLY! -------------------------------------------------------------------------------------------
         

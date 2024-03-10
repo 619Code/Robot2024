@@ -20,6 +20,8 @@ public class GoToInakePosCommand extends Command {
         subsystem.setGoal(Constants.HingeConstants.kIntakeAngle);
         subsystem.enable();
         OurRobotState.currentArmPosition = ArmPosEnum.INTAKE;
+        OurRobotState.isClimbing = false;
+
     }
 
     @Override

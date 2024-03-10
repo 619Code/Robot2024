@@ -26,15 +26,15 @@ public final class Constants {
         public static final double kHingeP = 0.27; //UNTUNED
         public static final double kHingeI = 0; //UNTUNED
         public static final double kHingeD = 0; //UNTUNED
-        public static final double kHingeG = .14; //TEMP VALUE NEEDS TUNING
-        public static final double kHingeV = 5.35; //TEMP VALUE NEEDS TUNING
-        public static final double kHingeA = 0.0; //TEMP VALUE NEEDS TUNING
-        public static final double kHingeS = 0.0;//TEMP VALUE NEEDS TUNING
+        public static final double kHingeG = .14; 
+        public static final double kHingeV = 5.35; 
+        public static final double kHingeA = 0.0; 
+        public static final double kHingeS = 0.0;
 
         public static final double kHingeMaxVelocityRadPerSecond = 0;
         public static final double KHingeMaxAccelerationRadPerSecond = 0;
 
-        public static final double kIntakeAngle = 108.4;
+        public static final double kIntakeAngle = 110.4;
         public static final double kShootingAngle = Constants.HingeConstants.kMinAngle;
         public static final double kAmpAngle = 127.5;
 
@@ -142,8 +142,8 @@ public final class Constants {
         public static final double kPhysicalMaxAngularSpeedDegreesPerSecond = 360; //2 * Math.PI; //kPhysicalMaxSpeedMetersPerSecond / Math.hypot(DriveConstants.kTrackWidth / 2.0, DriveConstants.kWheelBase / 2.0 * 3);
 
         //These are the variables that determine the max speeds of our swerve drive
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * (0.75); // Divide by 4 for slow testing. 
-        public static final double kTeleDriveMaxAngularSpeedDegreesPerSecond = kPhysicalMaxAngularSpeedDegreesPerSecond * (0.5);
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * (0.9); // Divide by 4 for slow testing. 
+        public static final double kTeleDriveMaxAngularSpeedDegreesPerSecond = kPhysicalMaxAngularSpeedDegreesPerSecond * (0.75);
         
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;

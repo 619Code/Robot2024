@@ -20,6 +20,7 @@ public class GoToAmpPosCommand extends Command {
         subsystem.setGoal(Constants.HingeConstants.kAmpAngle);
         subsystem.enable();
         OurRobotState.currentArmPosition = ArmPosEnum.AMP;
+        OurRobotState.isClimbing = false;
     }
 
     @Override

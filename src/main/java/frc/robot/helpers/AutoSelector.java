@@ -10,7 +10,7 @@ public class AutoSelector {
 
     public static boolean isFacingSide() {
         if (gyro != null) {
-            double angle = gyro.getAngle();
+            double angle = gyro.getAngle() - 180;       // Inverted since we will be facing backwards.
             if (Math.abs(angle) > 15) {
                 return true;
             } else return false;
@@ -22,7 +22,7 @@ public class AutoSelector {
 
     public static boolean isfacingLeft() {
         if (gyro != null) {
-            double angle = gyro.getAngle();
+            double angle = gyro.getAngle() - 180;       // Inverted since we will be facing backwards.
             if (angle < 0) {                            // SUBJECT TO CHANGE, INVERT IF NECESSARY!
                 return true;
             } else return false;

@@ -78,7 +78,7 @@ public class SwerveModule {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kBrake); // change to IdleMode.kBrake when ready.
         motor.setInverted(inverted);
-        motor.setSmartCurrentLimit(30);
+        motor.setSmartCurrentLimit(39);
         motor.burnFlash();
     }
 /////Get position from encoders rather than gyro
