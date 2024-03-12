@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -17,16 +17,20 @@ public class GoToShootPosCommand extends Command {
 
     @Override
     public void initialize() {
-        subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
+        if (OurRobotState.isClimbing) {
+            subsystem.setGoal(70);
+        } else {
+            subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
+        }
         subsystem.enable();
-        System.out.println("I am initialize");
+        //System.out.println("I am initialize");
         OurRobotState.currentArmPosition = ArmPosEnum.SPEAKER;
     }
 
     @Override
     public void execute() {
         subsystem.enable();
-        System.out.println("I am execute");
+        //System.out.println("I am execute");
     }
 
     @Override

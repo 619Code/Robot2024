@@ -1,5 +1,5 @@
 package frc.robot.helpers;
 
 public enum ArmPosEnum {
-    SPEAKER, AMP, INTAKE
+    SPEAKER, AMP, INTAKE, CLIMB
 }

@@ -23,6 +23,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     private final CANSparkMax hingeFollower;
 
     private final DutyCycleEncoder encoder;
+    private double outVoltage = 0;
 
     private RelativeEncoder hingeLeaderRelativeEncoder;     
     private RelativeEncoder hingeFollowerRelativeEncoder;
@@ -79,7 +80,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     @Override
     protected void useOutput(double output, State setpoint) {
         //double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
-
+        outVoltage = output;
         //System.out.println("Howdy! useOutput was successfully called. >:3c");
         System.out.println(output + " :3");
 
@@ -177,5 +178,9 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
         hingeLeader.enableSoftLimit(SoftLimitDirection.kReverse, true);
         hingeFollower.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
+    }
+
+    public boolean outputThresholdReached(double target) {
+        return Math.abs(outVoltage) >= target;
     }
 }

@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.DrivetrainCommands;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -22,7 +22,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 public class SwerveCommand extends Command {
 
-    private final double slow = 0.6;
+    private final double slow = 0.4;
 
     private final SwerveSubsystem swerveSubsystem;
     private final Joystick controller;
