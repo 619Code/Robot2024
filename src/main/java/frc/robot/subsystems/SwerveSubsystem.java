@@ -109,6 +109,7 @@ public class SwerveSubsystem extends SubsystemBase {
             try {
                 Thread.sleep(1000);
                 zeroHeading();
+                
             } 
             catch (Exception e) {
             }

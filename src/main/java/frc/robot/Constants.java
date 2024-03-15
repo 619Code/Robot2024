@@ -190,13 +190,13 @@ public final class Constants {
         public static final boolean kShooterLeaderInverted = true;
 
         public static final double intakeSpeed = 0.3;
-        public static final double intakeSpeedWhenOuttaking = 0.6;
-        public static final double outtakeSpeedSpeaker = 0.7;
-        public static final double outtakeSpeedAmp = 0.7;
+        public static final double intakeSpeedWhenOuttaking = 1;//0.6;
+        public static final double outtakeSpeedSpeaker = 1;
+        public static final double outtakeSpeedAmp = 1;
 
         public static final int kIntakeSensorPort = 9;  //0f test bed value
 
-        public static final int speakerShooterVelocityToReachBeforeFeedingNote = 3000;
+        public static final int speakerShooterVelocityToReachBeforeFeedingNote = 5000;//3000;
         public static final int ampShooterVelocityToReachBeforeFeedingNote = 1500;
         
     }
@@ -207,5 +207,16 @@ public final class Constants {
         
         public static final int kRightArmForwardPort = 3;
         public static final int kRightArmBackwardPort = 2;
+    }
+
+    public static final class GroundIntakeConstants{
+        public static final int intakeMotorId = 5;
+        public static final double intakeSpeed = 0.5;
+    }
+
+    public static final class SwitchboardConstants {
+        public static final int diOnesPort  = 8;
+        public static final int diTwosPort  = 7;
+        public static final int diFoursPort = 6;
     }
 } 
