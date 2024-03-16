@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -178,6 +180,8 @@ public class RobotContainer {
             new Rotation2d(0)}))
         .andThen( () -> swerveSubsystem.resetOdometry())
         .andThen(new AutoShootCommand(manipulatorSubsystem))
+        //.andThen(() -> swerveSubsystem.reorientMidMatch())
+        .andThen(new DriveToPointCommand(swerveSubsystem, -1.5, 0, 0.2))
         ;
 
         // EMERGENCY AUTO! DRIVE ONLY! -------------------------------------------------------------------------------------------

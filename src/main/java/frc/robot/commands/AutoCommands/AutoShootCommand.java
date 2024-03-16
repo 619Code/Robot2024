@@ -68,7 +68,7 @@ public class AutoShootCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        if (timer.hasElapsed(5)) {
+        if (timer.hasElapsed(3)) {
             timer.stop();
             timer.reset();
             return true;
