@@ -47,7 +47,8 @@ public class ShootCommand extends Command {
             this.RPMsRequiredForOuttake = 0;
         }
 
-        subsystem.spinShooterVoltage(this.outtakeSpeed); // test value, make sure to change once we g
+        //subsystem.spinShooterVoltage(this.outtakeSpeed); // test value, make sure to change once we g
+        subsystem.setShooterSpeedByRPM(RPMsRequiredForOuttake);
     }
 
     @Override
