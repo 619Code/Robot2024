@@ -52,7 +52,7 @@ public class RobotContainer {
     public static final boolean enableDrivetrain      = true;
     public static final boolean enableHinge           = true;
     public static final boolean enableManipulator     = true;
-    public static final boolean enableClimb           = false;
+    public static final boolean enableClimb           = true;
     public static final boolean enableGroundIntake    = false;
     public static final boolean enableAutoSwitchBoard = false;
 
@@ -92,7 +92,7 @@ public class RobotContainer {
         if (enableHinge) {
             hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
                 
-            operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
+      //      operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
             operatorController.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
 
             //operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
@@ -115,11 +115,18 @@ public class RobotContainer {
         }
 
         if (enableClimb) {
-            Trigger climbTrigger = operatorController.back();
-            climbTrigger.toggleOnTrue(new ClimbCommand(climbSubsystem));
+        //    Trigger climbTrigger = operatorController.back();
+            // climbTrigger.onTrue(new ClimbCommand(climbSubsystem));
+            // climbTrigger.onFalse(new ClimbCommand(climbSubsystem));
+
+            Trigger newClimbTrigger = operatorController.back();
+
+            newClimbTrigger.onTrue(new ClimbCommand(climbSubsystem));
+            newClimbTrigger.onFalse(new ClimbCommand(climbSubsystem));
 
             if (enableHinge) {
-                climbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
+       //         climbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
+                newClimbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
             }
         }
 

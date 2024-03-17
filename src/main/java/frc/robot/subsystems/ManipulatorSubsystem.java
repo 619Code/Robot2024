@@ -57,6 +57,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
         intakeLeader.set(speed);
     }
 
+    public void spintakeVoltage(double voltage) {
+        intakeLeader.setVoltage(voltage);
+    }
+
+    public void spinShooterVoltage(double voltage) {
+        shooterLeader.setVoltage(voltage);
+    }
+
     public void spinShooter(double speed) {
         shooterLeader.set(speed);
     }

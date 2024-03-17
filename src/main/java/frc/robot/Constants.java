@@ -194,9 +194,12 @@ public final class Constants {
         public static final double outtakeSpeedSpeaker = 1;
         public static final double outtakeSpeedAmp = 1;
 
+        public static final double outtakeSpeedSpeakerVoltage = 12;
+        public static final double outtakeSpeedAmpVoltage = 12;
+
         public static final int kIntakeSensorPort = 9;  //0f test bed value
 
-        public static final int speakerShooterVelocityToReachBeforeFeedingNote = 5000;//3000;
+        public static final int speakerShooterVelocityToReachBeforeFeedingNote = 4500;//3000;
         public static final int ampShooterVelocityToReachBeforeFeedingNote = 1500;
         
     }
