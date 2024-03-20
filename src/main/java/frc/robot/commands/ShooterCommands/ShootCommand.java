@@ -39,6 +39,10 @@ public class ShootCommand extends Command {
             this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
             this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
 
+        } else if (OurRobotState.currentArmPosition == ArmPosEnum.LONG_SHOT) {
+            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
+            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
+            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
         } else {
             // do nothing, no shooting!
                 // Shooter, no shooting!
@@ -55,7 +59,7 @@ public class ShootCommand extends Command {
         
          Crashboard.toDashboard("shooter flywheel RPMS: ", subsystem.GetShooterVelocity(), "shooter");
 
-        if(subsystem.GetShooterVelocity()   >= this.RPMsRequiredForOuttake){
+        if(subsystem.GetShooterVelocity()   >= this.RPMsRequiredForOuttake * 0.9){
 
             hasReachedVelocity = true;
 

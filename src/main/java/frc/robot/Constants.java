@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -42,6 +43,7 @@ public final class Constants {
         public static final double rawEncoderHigh = .617;
         public static final double degreesLow = 60;
         public static final double degreesHigh = 128;
+        public static final double kLongShotAngle = 77;
 
         }
 

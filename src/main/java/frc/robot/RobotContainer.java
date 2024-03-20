@@ -18,6 +18,7 @@ import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommandGroundIntakeTesting;
 import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
+import frc.robot.commands.ShooterCommands.GoToTrussPosCommand;
 import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.commands.ShooterCommands.ShootCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
@@ -55,6 +56,7 @@ public class RobotContainer {
     public static final boolean enableClimb           = true;
     public static final boolean enableGroundIntake    = false;
     public static final boolean enableAutoSwitchBoard = false;
+    public static final boolean enableLEDs            = false;
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,13 +94,15 @@ public class RobotContainer {
         if (enableHinge) {
             hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
                 
-      //      operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
+            operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
             operatorController.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
 
             //operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
             operatorController.b().whileTrue(new TestHingeCommand(hingeSubsystem, operatorController));
 
             operatorController.rightTrigger().whileTrue(new GoToInakePosCommandGroundIntakeTesting(hingeSubsystem));
+
+            operatorController.x().whileTrue(new GoToTrussPosCommand(hingeSubsystem));
             
         }
 

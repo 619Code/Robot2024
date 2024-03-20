@@ -42,7 +42,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public void periodic() {
         
         Crashboard.toDashboard("Sensor value: ", intakeProximitySensor.get(), "Manipulator");
-
         
 
     }
