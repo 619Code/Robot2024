@@ -203,6 +203,17 @@ public final class Constants {
 
         public static final int speakerShooterVelocityToReachBeforeFeedingNote = 4500;//3000;
         public static final int ampShooterVelocityToReachBeforeFeedingNote = 1500;
+
+        //Shooter PID
+        public static final double SHOOTER_KP = 0.0023237;
+        public static final double SHOOTER_KI = 0.0;
+        public static final double SHOOTER_KD = 0.0;
+        public static final double SHOOTER_KS = 0.18955;
+        public static final double SHOOTER_KV = 0.13861;
+        public static final double SHOOTER_KA = 0.0093339;
+        public static final double SHOOTER_MAX_RPM = 5600;
+        public static final double SHOOTER_MAX_OUTPUT = 1;
+        public static final double SHOOTER_MIN_OUTPUT = 0;
         
     }
 
