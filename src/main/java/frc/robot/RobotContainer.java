@@ -14,6 +14,7 @@ import frc.robot.commands.DrivetrainCommands.DriveToPointCommand;
 import frc.robot.commands.DrivetrainCommands.SwerveCommand;
 import frc.robot.commands.HingeCommands.HingeInitializeCommand;
 import frc.robot.commands.ShooterCommands.ClimbWithArmCommand;
+import frc.robot.commands.ShooterCommands.DefaultShootCommand;
 import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommandGroundIntakeTesting;
@@ -75,7 +76,7 @@ public class RobotContainer {
         }
 
         if (enableManipulator) {
-            //
+            manipulatorSubsystem.setDefaultCommand(new DefaultShootCommand(manipulatorSubsystem));
         }
 
         if (enableClimb) {

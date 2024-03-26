@@ -214,6 +214,8 @@ public final class Constants {
         public static final double SHOOTER_MAX_RPM = 5600;
         public static final double SHOOTER_MAX_OUTPUT = 1;
         public static final double SHOOTER_MIN_OUTPUT = 0;
+
+        public static final double shooterIdleRPM = 1000;
         
     }
 
