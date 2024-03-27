@@ -23,7 +23,7 @@ public class DefaultShootCommand extends Command {
     public void execute() {
         if(subsystem.intakeTrigged()){
 
-            subsystem.spinShooter(Constants.ManipulatorConstants.shooterIdleRPM);
+            subsystem.setShooterSpeedByRPM(Constants.ManipulatorConstants.shooterIdleRPM);
 
         }else{
 
