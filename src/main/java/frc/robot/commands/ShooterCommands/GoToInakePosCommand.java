@@ -32,6 +32,7 @@ public class GoToInakePosCommand extends Command {
     @Override
     public boolean isFinished() {
         //return subsystem.isAtPosition(Constants.HingeConstants.kIntakeAngle, 0 /*temp deadzone*/);
-        return subsystem.getController().atGoal();
+        //return subsystem.getController().atGoal();
+        return false;
     }
 }
