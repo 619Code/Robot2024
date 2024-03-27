@@ -26,7 +26,8 @@ public class GoToTrussPosCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return subsystem.getController().atGoal();
+        //return subsystem.getController().atGoal();
+        return false;
     }
 
     @Override
