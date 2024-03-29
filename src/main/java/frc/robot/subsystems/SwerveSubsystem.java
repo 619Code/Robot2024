@@ -189,6 +189,15 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveDriveKinematics getKinematics() {
         return kinematics;
     }
+
+    public void ResetRelativePositionEncoders()
+    {
+        frontLeft.resetEncoders();
+        frontRight.resetEncoders();
+        backLeft.resetEncoders();
+        backRight.resetEncoders();
+    }
+
     public void resetOdometry() {
         odometer.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(),

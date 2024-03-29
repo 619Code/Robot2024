@@ -1,8 +1,12 @@
 package frc.robot;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -32,6 +36,7 @@ import frc.robot.commands.ShooterCommands.ShootCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
 import frc.robot.commands.Unused.TestHingeCommand;
 import frc.robot.helpers.AutoSelector;
+import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.AutoSwitchBoardSub;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.GroundIntakeSubsystem;
@@ -190,6 +195,17 @@ public class RobotContainer {
         if (enableAutoSwitchBoard) selectedAuto = switchBoard.getSwitchCombo();
         System.out.println(selectedAuto);
 
+        
+        int allyMultiplier = 1;
+
+        Optional<Alliance> ally = DriverStation.getAlliance();
+        if(ally.isPresent()){
+            allyMultiplier = ally.get() == Alliance.Blue ? 1 : -1;
+        }
+
+        Crashboard.toDashboard("Alliance: ", ally.get().toString(), "Competition");
+
+
         if (selectedAuto == 1) {
             //just shoot speaker
             return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
@@ -199,6 +215,38 @@ public class RobotContainer {
             new Rotation2d(0),
             new Rotation2d(0)}))
                 .andThen(new AutoShootCommand(manipulatorSubsystem));
+        } else if(false) {
+                //  Shoot, delay and move at end of autonomous
+            
+                 return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
+                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+            new Rotation2d(0), 
+            new Rotation2d(0),
+            new Rotation2d(0),
+            new Rotation2d(0)}))
+                .andThen(new AutoShootCommand(manipulatorSubsystem))
+                .andThen(new WaitCommand(9.0))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3));
+                
+
+        }else if(true){
+
+            //   Starting source side (automatically detects red or blue)
+
+            return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
+                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+            new Rotation2d(0), 
+            new Rotation2d(0),
+            new Rotation2d(0),
+            new Rotation2d(0)}))
+                .andThen(() -> swerveSubsystem.resetOdometry())
+                .andThen(new AutoShootCommand(manipulatorSubsystem))
+                .andThen(new WaitCommand(7.0))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -2.3, 1.6 * allyMultiplier, 0.3))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, -2.1 * allyMultiplier, 0.3))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15));
+
+
         } else {
             //shoot and taxi
             return Commands.runOnce(() -> swerveSubsystem.zeroHeading())

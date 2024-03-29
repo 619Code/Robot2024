@@ -202,7 +202,7 @@ public final class Constants {
         public static final int kIntakeSensorPort = 9;  //0f test bed value
 
         public static final int speakerShooterVelocityToReachBeforeFeedingNote = 3500;//3000;
-        public static final int ampShooterVelocityToReachBeforeFeedingNote = 1500;
+        public static final int ampShooterVelocityToReachBeforeFeedingNote = 2000;
 
         //Shooter PID
         public static final double SHOOTER_KP = 0.0023237;
@@ -215,7 +215,7 @@ public final class Constants {
         public static final double SHOOTER_MAX_OUTPUT = 1;
         public static final double SHOOTER_MIN_OUTPUT = 0;
 
-        public static final double shooterIdleRPM = 1000;
+        public static final double shooterIdleRPM = 1500;
         
     }
 

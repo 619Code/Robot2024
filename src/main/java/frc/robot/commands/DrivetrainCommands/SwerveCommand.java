@@ -95,7 +95,7 @@ public class SwerveCommand extends Command {
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        double turningSpeed = controller.getRawAxis(4); // Changed for alternate driver. Axis 3 is the normal one.
+        double turningSpeed = controller.getRawAxis(3); // 4 is for thrust buttons. 
         if (Math.abs(turningSpeed) <= Constants.OIConstants.kDeadband) {
             turningSpeed = 0;
         }
