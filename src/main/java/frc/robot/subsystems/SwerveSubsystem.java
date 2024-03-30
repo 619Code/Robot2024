@@ -210,7 +210,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public void reorientMidMatch() {
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
                 zeroHeading();
             } 
             catch (Exception e) {
