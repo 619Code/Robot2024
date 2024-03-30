@@ -149,6 +149,9 @@ public final class Constants {
         
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
+
+        public static final double percentageOfMaxAngularDegreesPerSecond = 0.3;
+
     }
 
     //these we can ignore for now since they are only for autonmous 

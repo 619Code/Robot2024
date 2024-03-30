@@ -154,6 +154,7 @@ public class SwerveCommand extends Command {
                 //  Regular code for automatically rotating
 
                 turningSpeed = degreeAngleToAutomaticallyFace - swerveSubsystem.getHeading(); 
+                
                 //   At this point in the code, {turningSpeed} represents the total degree angle between our heading and the desired heading
                 //  therefore, if we are close enough, then stop
                 if(Math.abs(turningSpeed) <= satisfiedAngleDistanceFromDesiredAngle){
@@ -165,21 +166,21 @@ public class SwerveCommand extends Command {
 
                 //  How far we are between start and desired angle, represented between 0 and 1
                 double interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle = (degreeAngleToAutomaticallyFace - swerveSubsystem.getHeading()) / (degreeAngleToAutomaticallyFace - degreeAtStartOfAutoRotate);
-                Crashboard.toDashboard("Interpolation value: ", interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle, "Swerve");
                 
                 //  My sketchy ahh PID avoidance
-                if(interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle < 0.5){
-                    turningSpeed = MathUtil.interpolate(0, turningSpeed, interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle * 2.0f);  
+                if(interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle < 0.7){
+                    //  Couldn't find Math.Sign() so I did the sus abs value thing
+                    turningSpeed = (turningSpeed / Math.abs(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond * Constants.DriveConstants.percentageOfMaxAngularDegreesPerSecond);  
+                }else {
+                    turningSpeed = MathUtil.interpolate(DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond * Constants.DriveConstants.percentageOfMaxAngularDegreesPerSecond, 0.1, (interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle - 0.5) * 2.0f);  
                 }
-                if(interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle >= 0.5){
-                    turningSpeed = MathUtil.interpolate(turningSpeed, 0, (interpolationBetweenAngleAtStartOfAutoRotateAndDesiredAngle - 0.5) * 2.0f);  
-                }
-                Crashboard.toDashboard("Automatic rotate to angle current speed (unclamped):", turningSpeed, "Swerve");
 
                 //  Clamp to maxSpeed
                 turningSpeed = MathUtil.clamp(turningSpeed, -DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond, DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond);
             }
         }
+
+        Crashboard.toDashboard("Turning speed: ", turningSpeed, "Swerve");
 
         Crashboard.toDashboard("kTeleDriveMaxAngularSpeedDegreesPerSecond", DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond, "navx");
         //turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0.0;
@@ -196,7 +197,7 @@ public class SwerveCommand extends Command {
        
         //Crashboard.toDashboard("desired states", DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)[0].toString(), "navx");
     
-        previousFrameHatInput = hatInput;
+        previousFrameHatInput = controller.getPOV();
     
     }
 
@@ -208,6 +209,7 @@ public class SwerveCommand extends Command {
     private void initaiteNewRotateToPoint(int pointToRotateTo){
 
         hasReachedAngleToAutomaticallyRotateTo = false;
+        isAutomaticallyRotatingToAngle = true;
         elapsedTimeSinceInitiatingAutoRotate.restart();
         degreeAtStartOfAutoRotate = swerveSubsystem.getHeading();
         
@@ -259,7 +261,7 @@ public class SwerveCommand extends Command {
         Crashboard.toDashboard("Raw hat angle: ", controller.getPOV(), "Swerve");
 
         //  If this input was the same as last frame, then ignore it
-        if(previousFrameHatInput == output){
+        if(previousFrameHatInput == controller.getPOV()){
 
             return -1;
 
