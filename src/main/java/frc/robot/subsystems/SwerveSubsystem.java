@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -109,6 +110,7 @@ public class SwerveSubsystem extends SubsystemBase {
             try {
                 Thread.sleep(1000);
                 zeroHeading();
+                
             } 
             catch (Exception e) {
             }
@@ -117,6 +119,7 @@ public class SwerveSubsystem extends SubsystemBase {
     
     public void zeroHeading() {
         gyro.reset();
+        
     }
 
     public double getHeading() {
@@ -188,6 +191,15 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveDriveKinematics getKinematics() {
         return kinematics;
     }
+
+    public void ResetRelativePositionEncoders()
+    {
+        frontLeft.resetEncoders();
+        frontRight.resetEncoders();
+        backLeft.resetEncoders();
+        backRight.resetEncoders();
+    }
+
     public void resetOdometry() {
         odometer.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(),
@@ -200,7 +212,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public void reorientMidMatch() {
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
                 zeroHeading();
             } 
             catch (Exception e) {
