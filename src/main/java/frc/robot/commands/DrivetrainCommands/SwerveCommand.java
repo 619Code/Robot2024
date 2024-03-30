@@ -106,6 +106,14 @@ public class SwerveCommand extends Command {
 
         //  Get what hat input was pressed down this frame (-1 if nothing)
         int hatInput = GetHatDown();
+        
+        Crashboard.toDashboard("Sanitized hat input", hatInput, "Swerve");
+        Crashboard.toDashboard("Desired angle automatically rotating to: ", degreeAngleToAutomaticallyFace, "Swerve");
+        Crashboard.toDashboard("Current angle", swerveSubsystem.getHeading(), "Swerve");
+        Crashboard.toDashboard("Elapsed time since initiating auto rotate:", elapsedTimeSinceInitiatingAutoRotate.get(), "Swerve");
+        Crashboard.toDashboard("is currently rotating to the set angle angle", isAutomaticallyRotatingToAngle, "Swerve");
+        Crashboard.toDashboard("Are we close enough to the desired angle to stop rotating? ", hasReachedAngleToAutomaticallyRotateTo, "Swerve");
+        Crashboard.toDashboard("Angle we were facing when the button was pressed: ", degreeAtStartOfAutoRotate, "Swerve");
 
         //  Only if we actually got input this frame 
         if (hatInput != -1) {
@@ -113,6 +121,7 @@ public class SwerveCommand extends Command {
             //  0: face source
             //  1: face amp
             //  2: face speaker
+            //  3: face angle for assist
             initaiteNewRotateToPoint(hatInput);
         }
 
@@ -195,6 +204,7 @@ public class SwerveCommand extends Command {
     //  0: face source
     //  1: face amp
     //  2: face speaker
+    //  3: face angle for assist
     private void initaiteNewRotateToPoint(int pointToRotateTo){
 
         hasReachedAngleToAutomaticallyRotateTo = false;
@@ -216,6 +226,11 @@ public class SwerveCommand extends Command {
                 //  Driver pressed down on hat THIS FRAME
                 //  Face speaker
                 degreeAngleToAutomaticallyFace = 180;
+                break;
+            case 3:
+                //  Driver pressed down on hat THIS FRAME
+                //  Face direction for passing
+                degreeAngleToAutomaticallyFace = -141;
                 break;
         }
     }
@@ -240,6 +255,8 @@ public class SwerveCommand extends Command {
                 output = 3;
                 break;
         }
+
+        Crashboard.toDashboard("Raw hat angle: ", controller.getPOV(), "Swerve");
 
         //  If this input was the same as last frame, then ignore it
         if(previousFrameHatInput == output){
