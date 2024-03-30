@@ -25,19 +25,19 @@ public class AutoSwitchBoardSub extends SubsystemBase {
     }
 
     public boolean isPositionSourceSide() {
-        return diOnes.get();
+        return !diEights.get();
     }
 
     public boolean isPositionAmpSide() {
-        return diFours.get();
+        return !diTwos.get();
     }
 
     public boolean isPositionForward() {
-        return diTwos.get();
+        return !diFours.get();
     }
 
     public boolean shouldTaxi() {
-        return diEights.get();
+        return !diOnes.get();
     }
 
     public int getSwitchCombo() {
@@ -53,11 +53,11 @@ public class AutoSwitchBoardSub extends SubsystemBase {
     @Override
     public void periodic() {
         //Crashboard.toDashboard("auto switch", diOnes.get(), "Competition");
-        Crashboard.toDashboard("Switch One", diOnes.get(), "Competition");
-        Crashboard.toDashboard("Switch Two", diOnes.get(), "Competition");
-        Crashboard.toDashboard("Switch Three", diThrees.get(), "Competition");
-        Crashboard.toDashboard("Switch Four", diFours.get(), "Competition");
-        System.out.println(diOnes.get());
+        Crashboard.toDashboard("Taxi Switch", shouldTaxi(), "Competition");
+        Crashboard.toDashboard("Amp Side Switch", isPositionAmpSide(), "Competition");
+        Crashboard.toDashboard("Forward Side Switch", isPositionForward(), "Competition");
+        Crashboard.toDashboard("Source Side Switch", isPositionSourceSide(), "Competition");
+        //System.out.println(diOnes.get());
     }
 
 }

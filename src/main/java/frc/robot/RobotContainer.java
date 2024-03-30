@@ -54,7 +54,7 @@ public class RobotContainer {
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final GroundIntakeSubsystem groundIntakeSubsystem = new GroundIntakeSubsystem();
-    private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(true);
+    private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
     private final ledSubsystem LEDs = new ledSubsystem();
 
         
@@ -94,6 +94,10 @@ public class RobotContainer {
         }
 
         if (enableClimb) {
+            //
+        }
+
+        if (enableAutoSwitchBoard) {
             //
         }
 
@@ -240,7 +244,7 @@ public class RobotContainer {
                 .andThen(new AutoShootCommand(manipulatorSubsystem))
                 .andThen(new WaitCommand(6.0))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -2.3, 1.6 * allyMultiplier, 0.3))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, -2.1 * allyMultiplier, 0.3))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15));
 
         } else if (switchBoard.isPositionAmpSide()) {
@@ -252,11 +256,19 @@ public class RobotContainer {
             new Rotation2d(0),
             new Rotation2d(0)}))
                 .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new WaitCommand(7.0))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1, .5 * allyMultiplier, 0.1))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.1))
+                .andThen(new WaitCommand(8.0))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -0.7, -.3 * allyMultiplier, 0.3))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15));
         }
+
+        else return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
+                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+            new Rotation2d(0), 
+            new Rotation2d(0),
+            new Rotation2d(0),
+            new Rotation2d(0)}))
+                .andThen(new AutoShootCommand(manipulatorSubsystem));
     }
 
         // switch (selectedAuto) {
