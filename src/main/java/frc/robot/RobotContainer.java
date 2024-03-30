@@ -1,7 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import java.util.Optional;
-
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -187,14 +187,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
 
-        // return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        //         .andThen(new AutoShootCommand(manipulatorSubsystem));
-
         int selectedAuto = 0;
         if (enableAutoSwitchBoard) selectedAuto = switchBoard.getSwitchCombo();
         System.out.println(selectedAuto);
@@ -270,99 +262,4 @@ public class RobotContainer {
             new Rotation2d(0)}))
                 .andThen(new AutoShootCommand(manipulatorSubsystem));
     }
-
-        // switch (selectedAuto) {
-        //     // No auto.
-        //     case 0 -> {
-        //         return null;
-        //     }
-        //     // Basic taxi.
-        //     case 1 -> {
-        //         return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        //         .andThen(new DriveToPointCommand(swerveSubsystem, -1.5, 0, 0.1))
-        //         ;
-        //     }
-        //     // Just shoot speaker.
-        //     case 2 -> {
-        //         return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        //         .andThen(new AutoShootCommand(manipulatorSubsystem))
-        //         ;
-        //     }
-        //     // Just shoot amp.
-        //     case 3 -> {
-        //         return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        //         .andThen(
-        //             Commands.parallel(
-        //                 new GoToAmpPosCommand(hingeSubsystem),
-        //                 new AutoShootCommand(manipulatorSubsystem)
-        //             )
-        //         )
-        //         ;
-        //     }
-        //     // Speaker shot, then taxi. ONLY WORKS DEAD ON.
-        //     case 4 -> {
-        //         return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        //         .andThen(new AutoShootCommand(manipulatorSubsystem))
-        //         .andThen(new DriveToPointCommand(swerveSubsystem, -1.5, 0, 0.1))
-        //         ;
-        //     }
-        //     // Amp shot, then taxi.
-        //     case 5 -> {
-        //         return null;
-        //     }
-        //     // nothing yet
-        //     case 6 -> {
-        //         return null;
-        //     }
-        //     // option 7, revert to 0 just in case.
-        //     default -> {
-        //         return null;
-        //     }
-        //}
-
-        // EMERGENCY AUTO! SHOOT ONLY! -------------------------------------------------------------------------------------------
-        
-        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
-        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        // .andThen( () -> swerveSubsystem.resetOdometry())
-        // .andThen(new AutoShootCommand(manipulatorSubsystem))
-        // ;
-
-        // EMERGENCY AUTO! DRIVE ONLY! -------------------------------------------------------------------------------------------
-        
-        // return Commands.runOnce( () -> swerveSubsystem.zeroHeading())
-        // .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-        //     new Rotation2d(0), 
-        //     new Rotation2d(0),
-        //     new Rotation2d(0),
-        //     new Rotation2d(0)}))
-        // .andThen( () -> swerveSubsystem.resetOdometry())
-        // .andThen(new DriveToPointCommand(swerveSubsystem, -3, 0, 0.1))
-        // ;
-        
-    
 }

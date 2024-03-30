@@ -238,4 +238,9 @@ public final class Constants {
         public static final int diFoursPort = 6;
         public static final int diEightsPort = 5;
     }
+
+    public static final class LEDConstants {
+        public static final int CANdleid = 20;
+        public static final int ledCount = 200;
+    }
 } 
