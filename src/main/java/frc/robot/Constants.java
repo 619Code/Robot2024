@@ -234,7 +234,8 @@ public final class Constants {
 
     public static final class SwitchboardConstants {
         public static final int diOnesPort  = 8;
-        public static final int diTwosPort  = 7;
+        public static final int diTwosPort  = 7;        
         public static final int diFoursPort = 6;
+        public static final int diEightsPort = 5;
     }
 } 

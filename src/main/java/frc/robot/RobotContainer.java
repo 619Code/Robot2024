@@ -195,9 +195,9 @@ public class RobotContainer {
         if (enableAutoSwitchBoard) selectedAuto = switchBoard.getSwitchCombo();
         System.out.println(selectedAuto);
 
-        
+        // ally multiplier is used to set the proper direction for 
+        //  red vs blue since they are mirrored
         int allyMultiplier = 1;
-
         Optional<Alliance> ally = DriverStation.getAlliance();
         if(ally.isPresent()){
             allyMultiplier = ally.get() == Alliance.Blue ? 1 : -1;
@@ -205,8 +205,7 @@ public class RobotContainer {
 
         Crashboard.toDashboard("Alliance: ", ally.get().toString(), "Competition");
 
-
-        if (selectedAuto == 1) {
+        if (!switchBoard.shouldTaxi()) {
             //just shoot speaker
             return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
                 .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
@@ -215,9 +214,8 @@ public class RobotContainer {
             new Rotation2d(0),
             new Rotation2d(0)}))
                 .andThen(new AutoShootCommand(manipulatorSubsystem));
-        } else if(false) {
-                //  Shoot, delay and move at end of autonomous
-            
+        } else if(switchBoard.isPositionForward()) {
+                //  Shoot, delay and move at end of autonomous            
                  return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
                 .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
             new Rotation2d(0), 
@@ -229,10 +227,9 @@ public class RobotContainer {
                 .andThen(new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3));
                 
 
-        }else if(true){
+        }else if(switchBoard.isPositionSourceSide()){
 
             //   Starting source side (automatically detects red or blue)
-
             return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
                 .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
             new Rotation2d(0), 
@@ -241,13 +238,12 @@ public class RobotContainer {
             new Rotation2d(0)}))
                 .andThen(() -> swerveSubsystem.resetOdometry())
                 .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new WaitCommand(7.0))
+                .andThen(new WaitCommand(6.0))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -2.3, 1.6 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, -2.1 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15));
 
-
-        } else {
+        } else if (switchBoard.isPositionAmpSide()) {
             //shoot and taxi
             return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
                 .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
@@ -256,10 +252,10 @@ public class RobotContainer {
             new Rotation2d(0),
             new Rotation2d(0)}))
                 .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -3.0,0, 0.1))
-                .andThen(new DriveToPointCommand(swerveSubsystem, 0, 1, 0.1))
-                //.andThen(new DriveToPointCommand(swerveSubsystem, 45, 0.1))
-                ;
+                .andThen(new WaitCommand(7.0))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1, .5 * allyMultiplier, 0.1))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.1))
+                .andThen(new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15));
         }
     }
 
