@@ -71,7 +71,7 @@ public class RobotContainer {
     public static final boolean enableClimb           = true;
     public static final boolean enableGroundIntake    = false;
     public static final boolean enableAutoSwitchBoard = true;
-    public static final boolean enableLEDs            = false;
+    public static final boolean enableLEDs            = true;
 
     //////////////////////////////////////////////////////////////////////////////////////
 
