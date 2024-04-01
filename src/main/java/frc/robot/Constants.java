@@ -43,7 +43,7 @@ public final class Constants {
         public static final double rawEncoderHigh = .617;
         public static final double degreesLow = 60;
         public static final double degreesHigh = 128;
-        public static final double kLongShotAngle = 77;
+        public static final double kLongShotAngle = 70;
 
         }
 
@@ -202,6 +202,7 @@ public final class Constants {
         public static final int kIntakeSensorPort = 9;  //0f test bed value
 
         public static final int speakerShooterVelocityToReachBeforeFeedingNote = 3500;//3000;
+        public static final int passerShooterVelocityToReachBeforeFeedingNote = 5000;//3000
         public static final int ampShooterVelocityToReachBeforeFeedingNote = 2000;
 
         //Shooter PID
@@ -209,7 +210,7 @@ public final class Constants {
         public static final double SHOOTER_KI = 0.0;
         public static final double SHOOTER_KD = 0.0;
         public static final double SHOOTER_KS = 0.18955;
-        public static final double SHOOTER_KV = 0.13861;
+        public static final double SHOOTER_KV = 0.15861;//.13861
         public static final double SHOOTER_KA = 0.0093339;
         public static final double SHOOTER_MAX_RPM = 5600;
         public static final double SHOOTER_MAX_OUTPUT = 1;
