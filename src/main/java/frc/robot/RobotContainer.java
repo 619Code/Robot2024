@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.GroundIntakeCommand;
+import frc.robot.commands.LedAnimationCommand;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
@@ -55,9 +56,7 @@ public class RobotContainer {
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final GroundIntakeSubsystem groundIntakeSubsystem = new GroundIntakeSubsystem();
     private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
-    private final ledSubsystem LEDs = new ledSubsystem();
-
-        
+    private final ledSubsystem LEDs = new ledSubsystem();        
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,6 +98,11 @@ public class RobotContainer {
 
         if (enableAutoSwitchBoard) {
             //
+        }
+
+        if (enableLEDs)
+        {
+            LEDs.setDefaultCommand(new LedAnimationCommand(LEDs));
         }
 
         configureButtonBindings();

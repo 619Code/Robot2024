@@ -19,8 +19,8 @@ public class ledSubsystem extends SubsystemBase {
 
     public ledSubsystem() {
         this.candle = new CANdle(Constants.LEDConstants.CANdleid);
-        currentAnimation = new ColorFlowAnimation(255, 0, 0, 0, 0.8, Constants.LEDConstants.ledCount,
-                Direction.Forward);
+        // currentAnimation = new ColorFlowAnimation(255, 0, 0, 0, 0.8, Constants.LEDConstants.ledCount,
+        //         Direction.Forward);
 
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.v5Enabled = true;
@@ -33,14 +33,14 @@ public class ledSubsystem extends SubsystemBase {
 
     }
 
-    public void StartAnimation() {
-        candle.animate(currentAnimation);
-    }
+    // public void StartAnimation() {
+    //     //candle.animate(currentAnimation);
+    // }
 
-    public void StopAnimation() {
-        candle.animate(null);
-        // candle.clearAnimation(0);
-    }
+    // public void StopAnimation() {
+    //     //candle.animate(null);
+    //     // candle.clearAnimation(0);
+    // }
 
     public void setColor(int r, int g, int b) {
         candle.setLEDs(r, g, b);
