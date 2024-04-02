@@ -27,7 +27,7 @@ public class ledSubsystem extends SubsystemBase {
         configAll.statusLedOffWhenActive = false;
         configAll.disableWhenLOS = false;
         configAll.stripType = LEDStripType.RGB;
-        configAll.brightnessScalar = 1;
+        configAll.brightnessScalar = .7;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         this.candle.configAllSettings(configAll, 100);
 
