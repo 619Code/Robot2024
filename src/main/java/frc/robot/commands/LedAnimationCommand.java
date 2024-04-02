@@ -32,7 +32,7 @@ public class LedAnimationCommand extends Command {
 
     public LedAnimationCommand(ledSubsystem subsystem) {
         this.subsystem = subsystem;
-        sideLedCount = 40;
+        sideLedCount = 42;
         //System.out.println("This was called");
         animations = new ArrayList<CARAnimation>();
         animations.add(new NightRider(new Color(0, 0, 255), new Color(255, 64, 0), 6, 1, sideLedCount,initialOffset, false, subsystem));
