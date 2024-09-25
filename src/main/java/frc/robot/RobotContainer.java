@@ -238,10 +238,11 @@ public class RobotContainer {
             new Rotation2d(0)}))
                 .andThen(() -> swerveSubsystem.resetOdometry())
                 .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new WaitCommand(6.0))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -2.3, 1.6 * allyMultiplier, 0.3))
+                .andThen(new WaitCommand(5.0))
+                .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, 1.0 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15));
+                //.andThen(() -> swerveSubsystem.reorientMidMatch());
 
         } else if (switchBoard.isPositionAmpSide()) {
             //shoot and taxi
@@ -256,6 +257,7 @@ public class RobotContainer {
                 .andThen(new DriveToPointCommand(swerveSubsystem, -0.7, -.3 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.3))
                 .andThen(new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15));
+                //.andThen(() -> swerveSubsystem.reorientMidMatch());
         }
 
         else return Commands.runOnce(() -> swerveSubsystem.zeroHeading())

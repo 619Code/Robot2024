@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.OurRobotState;
 import frc.robot.helpers.Crashboard;
 
 public class ManipulatorSubsystem extends SubsystemBase {
@@ -67,6 +68,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public void periodic() {
         
         Crashboard.toDashboard("Sensor value: ", intakeProximitySensor.get(), "Manipulator");
+        OurRobotState.hasNote = !intakeProximitySensor.get();
         
 
     }

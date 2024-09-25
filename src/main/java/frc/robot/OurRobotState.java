@@ -7,4 +7,5 @@ public class OurRobotState {
     public static ArmPosEnum currentArmPosition = ArmPosEnum.SPEAKER;
     public static boolean isClimbing = false;
     public static boolean isEnabled = false;
+    public static boolean hasNote = false;
 }
