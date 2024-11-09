@@ -76,23 +76,23 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         if (enableDrivetrain) {
-            // swerveSubsystem.setDefaultCommand(new SwerveCommand(
-            //     swerveSubsystem, 
-            //     () -> {return axisSmoother(-controller.getLeftY());}, // dx
-            //     () -> {return axisSmoother(-controller.getLeftX());}, // dy
-            //     () -> {return axisSmoother(controller.getRightX());}, //domega
-            //     (BooleanSupplier)controller.rightBumper(), // slow mode
-            //     (BooleanSupplier)controller.leftStick() // reorient
-            // ));
-
             swerveSubsystem.setDefaultCommand(new SwerveCommand(
                 swerveSubsystem, 
-                () -> {return controller.a().getAsBoolean() ? 0.5 : 0.0;}, // dx
-                () -> {return 0.0;}, // dy
-                () -> {return 0.0;}, //domega
+                () -> {return axisSmoother(-controller.getLeftY());}, // dx
+                () -> {return axisSmoother(-controller.getLeftX());}, // dy
+                () -> {return axisSmoother(controller.getRightX());}, //domega
                 (BooleanSupplier)controller.rightBumper(), // slow mode
                 (BooleanSupplier)controller.leftStick() // reorient
             ));
+
+            // swerveSubsystem.setDefaultCommand(new SwerveCommand(
+            //     swerveSubsystem, 
+            //     () -> {return controller.a().getAsBoolean() ? 0.5 : 0.0;}, // dx
+            //     () -> {return 0.0;}, // dy
+            //     () -> {return 0.0;}, //domega
+            //     (BooleanSupplier)controller.rightBumper(), // slow mode
+            //     (BooleanSupplier)controller.leftStick() // reorient
+            // ));
         }
 
         if (enableHinge) {

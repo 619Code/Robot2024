@@ -141,7 +141,7 @@ public class SwerveModule {
         moduleTuning = new SwerveModuleTuning(
             0.000418,
             0.000418, 
-            0.1,
+            0.01,
             0.0,
             0.0,
             this.ModuleName
@@ -242,7 +242,7 @@ public class SwerveModule {
         //state.speedMetersPerSecond *= state.angle.minus(Rotation2d.fromDegrees(getAbsoluteEncoderDeg())).getCos();
         
         // Calculate the drive output from the drive PID controller. ;}
-        double driveSpeed = MathUtil.clamp(state.speedMetersPerSecond  / Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond/* / 360*/, -.80 ,.80);
+        double driveSpeed = MathUtil.clamp(state.speedMetersPerSecond  / Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond/* / 360*/, -1 ,1);
   
         driveMotor.set(driveSpeed);
         driveMotorSim.setInputVoltage(driveSpeed * RobotController.getBatteryVoltage());
