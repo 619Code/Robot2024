@@ -1,22 +1,16 @@
 package frc.robot.commands.DrivetrainCommands;
 
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANSparkMax;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -25,23 +19,45 @@ public class SwerveCommand extends Command {
     private final double slow = 0.4;
 
     private final SwerveSubsystem swerveSubsystem;
-    private final Joystick controller;
-    private CANcoder FrontLeftCoder;
-    private CANSparkMax FrontLeftTurnSpark;
+    private final DoubleSupplier getDx;
+    private final DoubleSupplier getDy; 
+    private final DoubleSupplier getDOmega;
+    private final BooleanSupplier activateSlowMode;
+    private final BooleanSupplier reorient;
 
-    private SlewRateLimiter driveLimiter, driveLimiterX, driveLimiterY, turnLimiter;
+    private SlewRateLimiter driveLimiterX, driveLimiterY, turnLimiter;
 
     public SwerveCommand(SwerveSubsystem swerveSubsystem, Joystick controller) {
+        this(
+            swerveSubsystem, 
+            () -> {return controller.getRawAxis(1);},
+            () -> {return controller.getRawAxis(0);},
+            () -> {return controller.getRawAxis(3);},
+            () -> {return controller.getRawButton(1);},
+            () -> {return controller.getRawButtonPressed(2);}
+        );
+    }
+
+    public SwerveCommand(
+        SwerveSubsystem swerveSubsystem, 
+        DoubleSupplier dx, 
+        DoubleSupplier dy, 
+        DoubleSupplier domega,
+        BooleanSupplier activateSlowMode,
+        BooleanSupplier reorient
+    ) {
         this.swerveSubsystem = swerveSubsystem;
-        this.controller = controller;
+        this.getDx = dx;
+        this.getDy = dy;
+        this.getDOmega = domega;
+        this.activateSlowMode = activateSlowMode;
+        this.reorient = reorient;
+
         addRequirements(swerveSubsystem);
-        this.FrontLeftCoder = swerveSubsystem.frontLeft.getCANcoder();
-        this.FrontLeftTurnSpark = swerveSubsystem.frontLeft.turningMotor;
 
         driveLimiterX = new SlewRateLimiter(16);
         driveLimiterY = new SlewRateLimiter(16);
         turnLimiter = new SlewRateLimiter(20);
-        //driveLimiter = new SlewRateLimiter(0.5);
     }
 
     @Override
@@ -53,23 +69,16 @@ public class SwerveCommand extends Command {
 
         // reorient button!
 
-        if (controller.getRawButtonPressed(2)) {
+        if (reorient.getAsBoolean()) {
             swerveSubsystem.reorientMidMatch();
         }
 
         // end reorient
 
-        boolean slowMode = controller.getRawButton(1);
-
-        // :3
-
-        //
-        //System.out.println("ANGLE = " + swerveSubsystem.frontLeft.getAbsoluteEncoderDeg() + ", SPEED = " + FrontLeftTurnSpark.get());
-
-        // \:3
+        boolean slowMode = activateSlowMode.getAsBoolean();
         
         //double xSpeed = Math.abs(controller.getLeftY()) > OIConstants.kDeadband ? controller.getLeftY() : 0.0;
-        double xSpeed = controller.getRawAxis(1);
+        double xSpeed = getDx.getAsDouble();
         if (Math.abs(xSpeed) <= Constants.OIConstants.kDeadband) {
             xSpeed = 0;
         }
@@ -82,7 +91,7 @@ public class SwerveCommand extends Command {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        double ySpeed = controller.getRawAxis(0);
+        double ySpeed = getDy.getAsDouble();
         if (Math.abs(ySpeed) <= Constants.OIConstants.kDeadband) {
             ySpeed = 0;
         }
@@ -95,7 +104,7 @@ public class SwerveCommand extends Command {
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        double turningSpeed = controller.getRawAxis(3);
+        double turningSpeed = getDOmega.getAsDouble();
         if (Math.abs(turningSpeed) <= Constants.OIConstants.kDeadband) {
             turningSpeed = 0;
         }
