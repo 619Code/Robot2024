@@ -1,23 +1,13 @@
 package frc.robot;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import java.util.Optional;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -25,21 +15,16 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.GroundIntakeCommand;
-import frc.robot.commands.LedAnimationCommand;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
-import frc.robot.commands.ClimbCommands.ClimbCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
 import frc.robot.commands.DrivetrainCommands.DriveToPointCommand;
 import frc.robot.commands.DrivetrainCommands.SwerveCommand;
 import frc.robot.commands.HingeCommands.HingeInitializeCommand;
 import frc.robot.commands.ShooterCommands.ClimbWithArmCommand;
-import frc.robot.commands.ShooterCommands.DefaultShootCommand;
 import frc.robot.commands.ShooterCommands.ClimbWithArmCommandDown;
 import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
-import frc.robot.commands.ShooterCommands.GoToInakePosCommandGroundIntakeTesting;
 import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
 import frc.robot.commands.ShooterCommands.GoToTrussPosCommand;
 import frc.robot.commands.ShooterCommands.IntakeCommand;
@@ -51,7 +36,6 @@ import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.AutoSwitchBoardSub;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.GroundIntakeSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ledSubsystem;
@@ -73,7 +57,6 @@ public class RobotContainer {
     private final CommandXboxController controller = new CommandXboxController(0);
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-    private final GroundIntakeSubsystem groundIntakeSubsystem = new GroundIntakeSubsystem();
     private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
     private final ledSubsystem LEDs = new ledSubsystem();        
 
@@ -296,36 +279,24 @@ public class RobotContainer {
 
             case FORWARD_SIDE:
             {
-
-                return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                    .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-                        new Rotation2d(0), 
-                        new Rotation2d(0),
-                        new Rotation2d(0),
-                        new Rotation2d(0)}))
-                    .andThen(new AutoShootCommand(manipulatorSubsystem))
-                    .andThen(new WaitCommand(9.0))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3));
+                return Commands.sequence(
+                    new AutoShootCommand(manipulatorSubsystem),
+                    new WaitCommand(1.0),
+                    new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3)
+                );
             }
 
             case SOURCE_SIDE:
             {
 
                 //   Starting source side (automatically detects red or blue)
-                return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                    .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-                        new Rotation2d(0), 
-                        new Rotation2d(0),
-                        new Rotation2d(0),
-                        new Rotation2d(0)}))
-                    .andThen(() -> swerveSubsystem.resetOdometry())
-                    .andThen(new AutoShootCommand(manipulatorSubsystem))
-                    .andThen(new WaitCommand(5.0))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, 1.0 * allyMultiplier, 0.3))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15));
-                    //.andThen(() -> swerveSubsystem.reorientMidMatch());
-
+                return Commands.sequence(
+                    new AutoShootCommand(manipulatorSubsystem),
+                    new WaitCommand(1.0),
+                    new DriveToPointCommand(swerveSubsystem, -1.7, 1.0 * allyMultiplier, 0.3),
+                    new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3),
+                    new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15)
+                );
             }
 
 
@@ -333,31 +304,19 @@ public class RobotContainer {
             {
 
                 //shoot and taxi
-                return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                    .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-                        new Rotation2d(0), 
-                        new Rotation2d(0),
-                        new Rotation2d(0),
-                        new Rotation2d(0)}))
-                    .andThen(new AutoShootCommand(manipulatorSubsystem))
-                    .andThen(new WaitCommand(8.0))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, -0.7, -.3 * allyMultiplier, 0.3))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.3))
-                    .andThen(new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15));
-                    //.andThen(() -> swerveSubsystem.reorientMidMatch());
+                return Commands.sequence(
+                    new AutoShootCommand(manipulatorSubsystem),
+                    new WaitCommand(1.0),
+                    new DriveToPointCommand(swerveSubsystem, -0.7, -.3 * allyMultiplier, 0.3),
+                    new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.3),
+                    new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15)
+                );
             }
         
             case DO_NOTHING:
             default:
             {
-                return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                    .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-                        new Rotation2d(0), 
-                        new Rotation2d(0),
-                        new Rotation2d(0),
-                        new Rotation2d(0)})
-                    )
-                    .andThen(new AutoShootCommand(manipulatorSubsystem));
+                return Commands.idle();
             }
         }
 

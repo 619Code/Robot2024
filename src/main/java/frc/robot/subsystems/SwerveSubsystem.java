@@ -194,12 +194,6 @@ public class SwerveSubsystem extends SubsystemBase {
         Crashboard.toDashboard("DETERMINED POSITION", "" + AutoSelector.getLocation(), "Competition");
         Crashboard.toDashboard("gyro angle", gyro.getAngle(), "navx");
         publisher_current.set(getModuleStates());
-        //System.out.println(getModuleStates()[1].speedMetersPerSecond);
-        //System.out.println(getModuleStates()[1].angle);
-        //SmartDashboard.putNumber("Front Right Wheel Angle", frontRight.getAbsoluteEncoderDeg());
-        //SmartDashboard.putNumber("Back Left Wheel Angle", backLeft.getAbsoluteEncoderDeg());
-        //SmartDashboard.putNumber("Back Right Wheel Angle", backRight.getAbsoluteEncoderDeg());
-        //SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
         fieldSim.setRobotPose(getPose2d());
     }
 
@@ -218,9 +212,7 @@ public class SwerveSubsystem extends SubsystemBase {
         backLeft.setDesiredState(desiredStates[2]);
         backRight.setDesiredState(desiredStates[3]);
         publisher.set(desiredStates);
-        //System.out.println(desiredStates);
         publisher_desired.set(desiredStates, 0);
-        System.out.println(desiredStates);
     }
 
     public SwerveModuleState[] getModuleStates() {

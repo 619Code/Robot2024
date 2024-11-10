@@ -81,8 +81,6 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     protected void useOutput(double output, State setpoint) {
         //double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
         outVoltage = output;
-        //System.out.println("Howdy! useOutput was successfully called. >:3c");
-        System.out.println(output + " :3");
 
         Crashboard.toDashboard("Motor Voltage", output, "Hinge");
         hingeLeader.setVoltage(output);

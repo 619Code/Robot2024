@@ -116,9 +116,6 @@ public class SwerveCommand extends Command {
         if (slowMode) turningSpeed *= slow;
 
         Crashboard.toDashboard("kTeleDriveMaxAngularSpeedDegreesPerSecond", DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond, "navx");
-        //turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0.0;
-        //turningSpeed = 0;
-        //System.out.println("xSpeed: " + xSpeed + " ySpeed: " + ySpeed + " turningSpeed: " + turningSpeed);
 
         double turningSpeedRadiansPerSecond = Rotation2d.fromDegrees(turningSpeed).getRadians();
         Rotation2d currentHeading = Rotation2d.fromDegrees(-swerveSubsystem.getHeading()); //inverted

@@ -38,7 +38,6 @@ public class ClimbSubsystem extends SubsystemBase {
 
     @Override
   public void periodic() {
-    //System.out.println("First: " + leftArm.get() + ", Second: " + rightArm.get());
   }
 
 }

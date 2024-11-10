@@ -1,10 +1,6 @@
 package frc.robot.commands.Animations;
 
-import com.revrobotics.jni.RevJNIWrapper;
-
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.Constants;
-import frc.robot.commands.Unused.ledCommand;
 import frc.robot.subsystems.ledSubsystem;
 
 public class NightRider implements CARAnimation {

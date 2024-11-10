@@ -258,20 +258,16 @@ public class SwerveModule {
         
                 
         double turnSpeed = (turningPidController.calculate(getAbsoluteEncoderDeg(), state.angle.getDegrees()));
-        //System.out.println("Turn Speed Calculated " + this.ModuleName + ": " + turnSpeed);
         if (turnSpeed > 0)
             turnSpeed = Math.min(turnSpeed, .2);
         else
             turnSpeed = Math.max(turnSpeed, -.2);
         
-        //System.out.println("Turn Speed Final " + this.ModuleName + ": " + turnSpeed);
-        // Crashboard.toDashboard(ModuleName + "Turn Speed Final", turnSpeed, "Swerve");
 
         //
         turningMotor.set(turnSpeed);
         turningMotorSim.setInputVoltage(turnSpeed * 12.0);
 
-        //System.out.println(ModuleName + "- DriveMotorCommand: " + driveSpeed + " - True Angle: " + getAbsoluteEncoderRad() + " AngleSetPoint: " + state.angle.getDegrees() + " AngleMotorCommand: " + turnSpeed);
     }
 
     public void updateSim(double dt) {
