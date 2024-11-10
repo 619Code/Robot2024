@@ -14,6 +14,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 
+/*
+ * WARNING!!!!
+ * 
+ * It looks like Choreo 2025 has significantly rearchitected the API 
+ * and .traj file format. They're moving to a more flexible AutoRoutine structure. 
+ * This code only works for the 2024 version.
+ */
+
 public class FollowTrajectoryCommand extends Command {
     private final ChoreoTrajectory trajectory;
     private final Timer timer;
