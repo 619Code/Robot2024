@@ -266,7 +266,7 @@ public class SwerveModule {
 
         //
         turningMotor.set(turnSpeed);
-        turningMotorSim.setInputVoltage(turnSpeed * 12.0);
+        turningMotorSim.setInputVoltage(turnSpeed * RobotController.getBatteryVoltage());
 
     }
 
