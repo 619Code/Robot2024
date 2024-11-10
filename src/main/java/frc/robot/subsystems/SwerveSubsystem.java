@@ -121,14 +121,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
         publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
                 
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                zeroHeading();
+        // new Thread(() -> {
+        //     try {
+        //         Thread.sleep(1000);
+        //         zeroHeading();
                 
-            } 
-            catch (Exception e) {}
-        }).start();
+        //     } 
+        //     catch (Exception e) {}
+        // }).start();
 
         fieldSim = new Field2d();
         SmartDashboard.putData("Field", fieldSim);
@@ -242,6 +242,14 @@ public class SwerveSubsystem extends SubsystemBase {
         backRight.resetEncoders();
     }
 
+    public void ResetRelativePositionEncoders(Rotation2d rotation)
+    {
+        frontLeft.resetEncoders(rotation);
+        frontRight.resetEncoders(rotation);
+        backLeft.resetEncoders(rotation);
+        backRight.resetEncoders(rotation);
+    }
+
     public void resetOdometry() {
         odometer.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(),
@@ -263,6 +271,22 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public AHRS getGyro() {
         return gyro;
+    }
+
+    public void initializePose(Pose2d initialPose) {
+        // Reset all the things
+        gyroSim.setAngle(initialPose.getRotation().getRadians());
+        odometer.resetPosition(
+            initialPose.getRotation(), 
+            new SwerveModulePosition[] {
+                frontLeft.getPosition(),
+                frontRight.getPosition(),
+                backLeft.getPosition(),
+                backRight.getPosition()
+            }, 
+            initialPose);
+        ResetRelativePositionEncoders(initialPose.getRotation());
+        fieldSim.setRobotPose(initialPose);
     }
     
 

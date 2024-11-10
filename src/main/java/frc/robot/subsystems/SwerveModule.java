@@ -215,6 +215,13 @@ public class SwerveModule {
 
     public void resetEncoders() {
         driveEncoder.setPosition(0);
+        driveMotorSim.setState(0.0, 0.0);
+        //turningEncoder.setPosition(0);
+    }
+
+    public void resetEncoders(Rotation2d rotation) {
+        driveEncoder.setPosition(rotation.getRotations());
+        driveMotorSim.setState(rotation.getRadians(), 0.0);
         //turningEncoder.setPosition(0);
     }
 
