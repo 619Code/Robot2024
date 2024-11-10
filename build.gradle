@@ -84,10 +84,10 @@ wpi.sim.addDriverstation()
 
 // Moves files into the deploy folder
 task copyChoreoToDeploy(type: Copy) {
-    from ('Choreo/') {
+    from ('Choreo/deploy/choreo') {
         include('*.traj')
     }
-    into ('src/main/deploy')
+    into ('src/main/deploy/choreo')
     
 }
 

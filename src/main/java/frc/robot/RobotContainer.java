@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
+import frc.robot.commands.AutoCommands.FollowTrajectoryCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
 import frc.robot.commands.DrivetrainCommands.DriveToPointCommand;
@@ -134,8 +135,6 @@ public class RobotContainer {
         }
 
         AutoSelector.setGyro(swerveSubsystem.getGyro());
-
-        configureButtonBindings();
     }
 
     private double axisSmoother(double axis) {
@@ -243,6 +242,14 @@ public class RobotContainer {
     
     }
 
+    public void configureForTeleop() {
+        if (RobotContainer.enableHinge) {
+            InitializeHinge(); // WHY is this done differently?!?!
+        }
+      
+        configureButtonBindings();
+    }
+
     public SwerveSubsystem getSwerve() {
         return swerveSubsystem;
     }
@@ -302,15 +309,8 @@ public class RobotContainer {
 
             case AMP_SIDE:
             {
-
                 //shoot and taxi
-                return Commands.sequence(
-                    new AutoShootCommand(manipulatorSubsystem),
-                    new WaitCommand(1.0),
-                    new DriveToPointCommand(swerveSubsystem, -0.7, -.3 * allyMultiplier, 0.3),
-                    new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.3),
-                    new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15)
-                );
+                return new FollowTrajectoryCommand("TestPath", swerveSubsystem, false);
             }
         
             case DO_NOTHING:
