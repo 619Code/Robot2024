@@ -2,8 +2,10 @@ package frc.robot.commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
+import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.ManipulatorSubsystem;
 
 public class ShootCommand extends Command {
@@ -25,16 +27,22 @@ public class ShootCommand extends Command {
     public void initialize() {
         if (OurRobotState.currentArmPosition == ArmPosEnum.AMP) {
 
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedAmp;
+ //           this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedAmp;
+            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
             this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
             this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.SPEAKER) {
 
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeaker;
+            //this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeaker;
+            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
             this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
             this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
 
+        } else if (OurRobotState.currentArmPosition == ArmPosEnum.LONG_SHOT) {
+            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
+            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
+            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote;
         } else {
             // do nothing, no shooting!
                 // Shooter, no shooting!
@@ -43,12 +51,16 @@ public class ShootCommand extends Command {
             this.RPMsRequiredForOuttake = 0;
         }
 
-        subsystem.spinShooter(this.outtakeSpeed); // test value, make sure to change once we g
+        //subsystem.spinShooterVoltage(this.outtakeSpeed); // test value, make sure to change once we g
+        subsystem.setShooterSpeedByRPM(RPMsRequiredForOuttake);
     }
 
     @Override
     public void execute() {
-        if(subsystem.GetShooterVelocity() >= this.RPMsRequiredForOuttake){
+        
+         Crashboard.toDashboard("shooter flywheel RPMS: ", subsystem.GetShooterVelocity(), "shooter");
+
+        if(subsystem.GetShooterVelocity()   >= this.RPMsRequiredForOuttake * 0.90){
 
             hasReachedVelocity = true;
 

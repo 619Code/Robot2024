@@ -6,10 +6,10 @@ import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.HingeSubsystem;
 
-public class GoToShootPosCommand extends Command {
+public class GoToInakePosCommandGroundIntakeTesting extends Command {
     private HingeSubsystem subsystem;
 
-    public GoToShootPosCommand(HingeSubsystem subsystem) {
+    public GoToInakePosCommandGroundIntakeTesting(HingeSubsystem subsystem) {
         this.subsystem = subsystem;
 
         addRequirements(subsystem);
@@ -17,20 +17,11 @@ public class GoToShootPosCommand extends Command {
 
     @Override
     public void initialize() {
-        if (OurRobotState.isClimbing) {
-            subsystem.setGoal(70);
-        } else {
-            subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
-        }
+        subsystem.setGoal(65);
         subsystem.enable();
-        //System.out.println("I am initialize");
-        OurRobotState.currentArmPosition = ArmPosEnum.SPEAKER;
-    }
+        OurRobotState.currentArmPosition = ArmPosEnum.INTAKE;
+        OurRobotState.isClimbing = false;
 
-    @Override
-    public void execute() {
-        subsystem.enable();
-        //System.out.println("I am execute");
     }
 
     @Override
@@ -40,7 +31,7 @@ public class GoToShootPosCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        //return subsystem.isAtPosition(Constants.HingeConstants.kShootingAngle, 0 /*temp deadzone*/);
+        //return subsystem.isAtPosition(Constants.HingeConstants.kIntakeAngle, 0 /*temp deadzone*/);
         //return subsystem.getController().atGoal();
         return false;
     }

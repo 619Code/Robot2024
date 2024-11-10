@@ -16,7 +16,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 public class SwerveCommand extends Command {
 
-    private final double slow = 0.4;
+    private final double slow = 0.3;
 
     private final SwerveSubsystem swerveSubsystem;
     private final DoubleSupplier getDx;

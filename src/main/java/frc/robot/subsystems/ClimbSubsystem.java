@@ -21,10 +21,19 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     public void reverse() {
-
         leftArm.toggle();
         rightArm.toggle();
         
+    }
+
+    public void goUp() {
+      leftArm.set(DoubleSolenoid.Value.kForward);
+      rightArm.set(DoubleSolenoid.Value.kForward);
+    }
+
+    public void goDown() {
+      leftArm.set(DoubleSolenoid.Value.kReverse);
+      rightArm.set(DoubleSolenoid.Value.kReverse);
     }
 
     @Override
