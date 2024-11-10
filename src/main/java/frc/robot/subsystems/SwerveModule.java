@@ -183,7 +183,7 @@ public class SwerveModule {
         if (Robot.isReal()) {
             return new SwerveModulePosition(driveEncoder.getPosition(), Rotation2d.fromDegrees(getAbsoluteEncoderDeg()));
         } else {
-            double speed = driveMotorSim.getAngularPositionRotations() * ModuleConstants.kDriveEncoderRPM2MeterPerSec;
+            double speed = driveMotorSim.getAngularPositionRotations() * ModuleConstants.kDriveEncoderRot2Meter;
             Rotation2d angle = Rotation2d.fromDegrees(getAbsoluteEncoderDeg());
             return new SwerveModulePosition(
                 speed,
@@ -219,7 +219,6 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getState() {
-        System.out.println(driveMotorSim.getAngularPositionRad());
         return new SwerveModuleState(getDriveVelocity(), Rotation2d.fromDegrees(getAbsoluteEncoderDeg()));
     }
 
