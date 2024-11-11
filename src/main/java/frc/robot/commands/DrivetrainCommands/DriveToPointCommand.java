@@ -86,8 +86,6 @@ public class DriveToPointCommand extends Command {
 
         secondPos = firstPos.transformBy(dPos);
 
-        System.out.println("Starting Odometry Position: (X/Y/R), X: " + swerve.getPose2d().getX() + ", Y: " + swerve.getPose2d().getY() + ", R: " + swerve.getPose2d().getRotation().getDegrees());
-
 
         // Get the time it would take for each item to reach the destination if it is at the max speed
 
@@ -111,9 +109,6 @@ public class DriveToPointCommand extends Command {
 
         double bottleneckTime = Math.max(Math.max(Math.abs(xSecMax), Math.abs(ySecMax)), Math.abs(tSecMax));
 
-        System.out.println("XSM: " + xSecMax + ", YSM: " + ySecMax + ", TSM: " + tSecMax);
-        System.out.println("BOTTLENECK: " + bottleneckTime);
-
         calculatedXSpeed = dx / bottleneckTime; // literally meters / seconds
         calculatedYSpeed = dy / bottleneckTime; 
         calculatedRotSpeed = dTheta / bottleneckTime;
@@ -121,9 +116,6 @@ public class DriveToPointCommand extends Command {
         // Right now, the calculated X and Y speeds are in meters/second, and not scalar values between 0 and 1.
 
         Rotation2d currentHeading = Rotation2d.fromDegrees(-swerve.getHeading()); //inverted
-
-        System.out.println("DX: " + dx + ", DY: " + dy + ", DTHETA: " + dTheta);
-        System.out.println("CXS: " + calculatedXSpeed + ", CYS: " + calculatedYSpeed + ", CRS: " + calculatedRotSpeed);
 
         ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed, currentHeading); //from Field
         swerve.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
@@ -139,10 +131,6 @@ public class DriveToPointCommand extends Command {
 
     @Override
     public boolean isFinished() {
-
-        //  System.out.println("X !!" + (swerve.getPose2d().getX() - secondPos.getX()) + "!!");
-        //  System.out.println("Y !!" + (swerve.getPose2d().getY() - secondPos.getY()) + "!!");
-        //  System.out.println("R !!" + (swerve.getPose2d().getRotation().getDegrees() - secondPos.getRotation().getDegrees()) + "!!");
 
          boolean xArrived = Math.abs(swerve.getPose2d().getX() - secondPos.getX()) <= 0.4;
          boolean yArrived = Math.abs(swerve.getPose2d().getY() - secondPos.getY()) <= 0.4;
@@ -162,9 +150,6 @@ public class DriveToPointCommand extends Command {
          }
 
          return stickyX && stickyY && stickyR;
-
-        // System.out.println("X !!" + (swerve.getPose2d().getX() - secondPos.getX()) + "!!");
-        // return (Math.abs(secondPos.getX() - swerve.getPose2d().getX()) <= 0.2);
     }
 
     @Override

@@ -57,7 +57,6 @@ public class AutoSwitchBoardSub extends SubsystemBase {
         Crashboard.toDashboard("Amp Side Switch", isPositionAmpSide(), "Competition");
         Crashboard.toDashboard("Forward Side Switch", isPositionForward(), "Competition");
         Crashboard.toDashboard("Source Side Switch", isPositionSourceSide(), "Competition");
-        //System.out.println(diOnes.get());
     }
 
 }
