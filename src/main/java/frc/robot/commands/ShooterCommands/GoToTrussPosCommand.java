@@ -6,33 +6,32 @@ import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.subsystems.HingeSubsystem;
 
-public class GoToInakePosCommand extends Command {
+public class GoToTrussPosCommand extends Command {
     private HingeSubsystem subsystem;
 
-    public GoToInakePosCommand(HingeSubsystem subsystem) {
-        this.subsystem = subsystem;
-
-        addRequirements(subsystem);
+    public GoToTrussPosCommand(HingeSubsystem s) {
+        subsystem = s;
+        addRequirements(s);
     }
 
     @Override
     public void initialize() {
-        subsystem.setGoal(Constants.HingeConstants.kIntakeAngle);
+        subsystem.setGoal(Constants.HingeConstants.kLongShotAngle);
         subsystem.enable();
-        OurRobotState.currentArmPosition = ArmPosEnum.INTAKE;
+        OurRobotState.currentArmPosition = ArmPosEnum.LONG_SHOT;
         OurRobotState.isClimbing = false;
+    }
 
+    
+
+    @Override
+    public boolean isFinished() {
+        //return subsystem.getController().atGoal();
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
         subsystem.disable();
-    }
-
-    @Override
-    public boolean isFinished() {
-        //return subsystem.isAtPosition(Constants.HingeConstants.kIntakeAngle, 0 /*temp deadzone*/);
-        //return subsystem.getController().atGoal();
-        return false;
     }
 }

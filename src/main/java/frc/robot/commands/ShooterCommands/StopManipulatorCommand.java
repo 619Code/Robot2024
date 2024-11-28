@@ -18,4 +18,10 @@ public class StopManipulatorCommand extends Command{
         subsystem.stopShooter();
         subsystem.stopIntake();
     }
+
+    @Override
+    public boolean isFinished(){
+        //  Terminate command immediately after initialization
+        return true;
+    }
 }

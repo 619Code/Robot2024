@@ -6,8 +6,10 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.helpers.LimelightHelpers;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class DriveToPointCommand extends Command {
@@ -19,6 +21,7 @@ public class DriveToPointCommand extends Command {
     private double calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed; 
     private double dx, dy, dTheta;
     private boolean stickyX, stickyY, stickyR;
+    private Trigger stop;
 
     public DriveToPointCommand(SwerveSubsystem subsystem, double changeinXMeters, double changeinYMeters, double percentageOfMaxSpeed) {
         stickyX = false;
@@ -55,6 +58,26 @@ public class DriveToPointCommand extends Command {
 
         addRequirements(subsystem);
     } 
+
+    public DriveToPointCommand(SwerveSubsystem subsystem, double percentageOfMaxSpeed, Trigger stopTrigger) {
+        stickyX = false;
+        stickyY = false;
+        stickyR = false;
+        stop = stopTrigger;
+
+        double changeinYMeters = -LimelightHelpers.getTX("");
+        double changeinXMeters = -LimelightHelpers.getTY("");
+        System.out.println(dx + " // " + dy);
+
+        swerve = subsystem;
+        dPos = new Transform2d(
+            new Translation2d(
+                changeinXMeters * Constants.DriveConstants.kNavxUnitsToMetersConversion, changeinYMeters * Constants.DriveConstants.kNavxUnitsToMetersConversion
+            ),
+            Rotation2d.fromDegrees(0)
+        );
+    }
+
 
     @Override
     public void initialize() {
