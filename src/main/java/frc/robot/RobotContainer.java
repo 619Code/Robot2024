@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.GroundIntakeCommand;
 import frc.robot.commands.LedAnimationCommand;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
+import frc.robot.commands.AutoCommands.NewLimeLightCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
@@ -56,7 +58,9 @@ public class RobotContainer {
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final GroundIntakeSubsystem groundIntakeSubsystem = new GroundIntakeSubsystem();
     private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
-    private final ledSubsystem LEDs = new ledSubsystem();        
+    private final ledSubsystem LEDs = new ledSubsystem();
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final NewLimeLightCommand limeLightCommand = new NewLimeLightCommand(swerveSubsystem);        
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -74,7 +78,6 @@ public class RobotContainer {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
     public RobotContainer() {
 
@@ -112,6 +115,7 @@ public class RobotContainer {
 
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+            new JoystickButton(driverOne, 1).whileTrue(limeLightCommand);
         }
 
         if (enableHinge) {
