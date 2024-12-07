@@ -73,7 +73,9 @@ public class NewLimeLightCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        getLimelightHeadingDegrees().magnitude() <= 0.5;
+        
+        return getLimelightHeadingDegrees().magnitude() <= 0.5;
+        
     }
 
 }
