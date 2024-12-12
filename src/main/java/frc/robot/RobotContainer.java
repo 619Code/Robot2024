@@ -13,10 +13,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
+import frc.robot.subsystems.NewLimelight;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.GroundIntakeCommand;
 import frc.robot.commands.LedAnimationCommand;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
+import frc.robot.commands.AutoCommands.LimelightCenterOnAprilTag;
 import frc.robot.commands.ClimbCommands.ClimbCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
@@ -56,7 +59,9 @@ public class RobotContainer {
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final GroundIntakeSubsystem groundIntakeSubsystem = new GroundIntakeSubsystem();
     private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
-    private final ledSubsystem LEDs = new ledSubsystem();        
+    private final ledSubsystem LEDs = new ledSubsystem();      
+    
+    private final NewLimelight limelight = new NewLimelight();
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,10 +72,12 @@ public class RobotContainer {
     public static final boolean enableDrivetrain      = true;
     public static final boolean enableHinge           = true;
     public static final boolean enableManipulator     = true;
-    public static final boolean enableClimb           = true;
+    public static final boolean enableClimb           = false;
     public static final boolean enableGroundIntake    = false;
     public static final boolean enableAutoSwitchBoard = true;
     public static final boolean enableLEDs            = true;
+
+    public static final boolean enableLimelight      = true; 
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -100,8 +107,7 @@ public class RobotContainer {
             //
         }
 
-        if (enableLEDs)
-        {
+        if (enableLEDs){
             LEDs.setDefaultCommand(new LedAnimationCommand(LEDs));
         }
 
@@ -112,6 +118,8 @@ public class RobotContainer {
 
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+            Trigger triggerTrigger = new JoystickButton(driverOne, 1);
+            triggerTrigger.whileTrue(new LimelightCenterOnAprilTag(swerveSubsystem, limelight));
         }
 
         if (enableHinge) {
@@ -177,6 +185,8 @@ public class RobotContainer {
             LEDs.setColor(0, 0, 255);
         }
         
+
+
         //   =========   OTHER BINDINGS   =========
     
     }
@@ -191,6 +201,36 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
 
+
+        return new LimelightCenterOnAprilTag(swerveSubsystem, limelight);
+
+
+        //  return Commands.repeatingSequence(
+        //     new WaitCommand(1).
+        //     andThen(new DriveToPointCommand(swerveSubsystem, limelight.GetGoofyAhhHeading(), 0.04))
+        //  );
+
+        // return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
+        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+        //     new Rotation2d(0), 
+        //     new Rotation2d(0),
+        //     new Rotation2d(0),
+        //     new Rotation2d(0)}))
+        //         .andThen(new WaitCommand(1))
+        //         .andThen(new DriveToPointCommand(swerveSubsystem, limelight.GetGoofyAhhHeading(), 0.04));
+
+        // return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
+        //         .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+        //     new Rotation2d(0), 
+        //     new Rotation2d(0),
+        //     new Rotation2d(0),
+        //     new Rotation2d(0)}))
+        //         .andThen(new WaitCommand(0.2))
+        //         .andThen(new DriveToPointCommand(swerveSubsystem, limelight.GetGoofyAhhHeading(), 0.1));
+
+
+
+        /* 
         int selectedAuto = 0;
         if (enableAutoSwitchBoard) selectedAuto = switchBoard.getSwitchCombo();
         System.out.println(selectedAuto);
@@ -267,5 +307,6 @@ public class RobotContainer {
             new Rotation2d(0),
             new Rotation2d(0)}))
                 .andThen(new AutoShootCommand(manipulatorSubsystem));
+                */
     }
 }

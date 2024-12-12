@@ -59,7 +59,7 @@ public class SwerveCommand extends Command {
 
         // end reorient
 
-        boolean slowMode = controller.getRawButton(1);
+        boolean slowMode = false; //controller.getRawButton(1);
 
         // :3
 
@@ -95,7 +95,7 @@ public class SwerveCommand extends Command {
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        double turningSpeed = controller.getRawAxis(3); // 4 is for thrust buttons. 
+        double turningSpeed = controller.getRawAxis(2); // 4 is for thrust buttons. 
         if (Math.abs(turningSpeed) <= Constants.OIConstants.kDeadband) {
             turningSpeed = 0;
         }
