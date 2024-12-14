@@ -20,6 +20,7 @@ import frc.robot.commands.GroundIntakeCommand;
 import frc.robot.commands.LedAnimationCommand;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
 import frc.robot.commands.AutoCommands.LimelightCenterOnAprilTag;
+import frc.robot.commands.AutoCommands.NewLimelightAutoCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
@@ -119,7 +120,7 @@ public class RobotContainer {
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
             Trigger triggerTrigger = new JoystickButton(driverOne, 1);
-            triggerTrigger.whileTrue(new LimelightCenterOnAprilTag(swerveSubsystem, limelight));
+            triggerTrigger.whileTrue(new NewLimelightAutoCommand(swerveSubsystem, limelight));
         }
 
         if (enableHinge) {

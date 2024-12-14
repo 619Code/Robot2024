@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.IntegerEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
@@ -19,7 +20,7 @@ import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.NewLimelight;
 import frc.robot.subsystems.SwerveSubsystem;
 
-public class LimelightCenterOnAprilTag extends Command {
+public class NewLimelightAutoCommand extends Command {
     
     private final NewLimelight limelightSubsystem;
     private final SwerveSubsystem swerveSubsystem;
@@ -43,8 +44,9 @@ public class LimelightCenterOnAprilTag extends Command {
   //  IntegerEntry filterTapsNetworkEntry;
     int filterTaps = 3;
 
- //   private final PIDController rotationPid;
+    private final PIDController rotationPid;
     private final PIDController YmovementPid;
+    private final PIDController XmovementPid;
     private final PIDController rot2Pid;
 
 
@@ -53,6 +55,7 @@ public class LimelightCenterOnAprilTag extends Command {
 
     private LinearFilter rotationFilter;
     private LinearFilter xMovementFilter;
+    private LinearFilter yMovementFilter;
     private LinearFilter rot2Filter;
 
     double[] targetPosData;
@@ -62,19 +65,26 @@ public class LimelightCenterOnAprilTag extends Command {
 
 
     private enum CenteringStates{
-        INITIAL_ORIENTATION,
-        MOVING_TOWARDS_POINT
+        MOVING_AND_ROTATING,
+        IDLE
     }
 
     private CenteringStates currentState;
 
 
-    public LimelightCenterOnAprilTag(SwerveSubsystem _swerveSubsystem, NewLimelight _limelightSub){
+    private double desiredZOffset = 1.5;
+    private double desiredXOffset = 0;
+    private double desiredRotationOffset = 0;
+
+    public NewLimelightAutoCommand(SwerveSubsystem _swerveSubsystem, NewLimelight _limelightSub){
         limelightSubsystem = _limelightSub;
         swerveSubsystem = _swerveSubsystem;
 
-   //     rotationPid = new PIDController(0.07, 0, 0.0016);
+        rotationPid = new PIDController(0.07, 0, 0.0016);
         YmovementPid = new PIDController(2, 0, 0.1);
+        XmovementPid = new PIDController(2, 0, 0.1);
+        // YmovementPid = new PIDController(0.6, 0, 0);
+        // XmovementPid = new PIDController(0.6, 0, 0);
         rot2Pid = new PIDController(0.07, 0, 0.0016);
 
   //      anglePub = NetworkTableInstance.getDefault().getDoubleTopic("LimelightAngle").publish();
@@ -92,7 +102,7 @@ public class LimelightCenterOnAprilTag extends Command {
         kiMovementNetworkEntry  = NetworkTableInstance.getDefault().getDoubleTopic("kiM").getEntry(0.0);
         kdMovementNetworkEntry  = NetworkTableInstance.getDefault().getDoubleTopic("kdM").getEntry(0.0);
 
-        targetPoseTable = NetworkTableInstance.getDefault().getTable("limelight").getEntry("targetpose_robotspace");
+        targetPoseTable = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_targetspace");
    //     filterTapsNetworkEntry = NetworkTableInstance.getDefault().getIntegerTopic("fTaps").getEntry(0);
 
         kpRotationNetworkEntry.set(0.0);
@@ -111,6 +121,7 @@ public class LimelightCenterOnAprilTag extends Command {
 
         rotationFilter = LinearFilter.movingAverage(filterTaps);
         xMovementFilter = LinearFilter.movingAverage(3);
+        yMovementFilter = LinearFilter.movingAverage(3);
         rot2Filter = LinearFilter.movingAverage(3);
 
         generalTimer = new Timer();
@@ -122,7 +133,7 @@ public class LimelightCenterOnAprilTag extends Command {
 
     @Override
     public void initialize() {
-        SwitchToState(CenteringStates.INITIAL_ORIENTATION);
+        SwitchToState(CenteringStates.MOVING_AND_ROTATING);
     }
 
     @Override
@@ -131,54 +142,52 @@ public class LimelightCenterOnAprilTag extends Command {
         
       RetrieveDataFromTables();
 
+
+      double xSpeedMpS = 0;
+      double ySpeedMpS = 0;
+      double rotationSpeedRpS = 0;
+
       switch(currentState) {
-        case INITIAL_ORIENTATION:
+        case MOVING_AND_ROTATING:
         //  AimTowardsAprilTag();
-          AimPerpindicularToAprilTag();
+      //    rotationSpeedRpS = AimPerpindicularToAprilTag();
+          rotationSpeedRpS = AimTowardsAprilTag();
 
-          CheckStateMachineInitialOrientationStage();
+          double[] speeds = MovingToPoint();
+
+          xSpeedMpS = speeds[0];
+          ySpeedMpS = speeds[1];
+          // ySpeedMpS = speeds[1] * Math.signum(limelightSubsystem.GetGoofyAhhHeading());
+
+          CheckStateMachineMovingAndRottingStage();
           break;
-        case MOVING_TOWARDS_POINT:
-          MovingToPoint();
-
-          CheckStateMachineMovingTopositionStage();
+        case IDLE:
           break;
         default:
             break;
       }
 
+
+      ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(-xSpeedMpS, -ySpeedMpS, rotationSpeedRpS, Rotation2d.fromDegrees(targetPosData[4])); //from Field
+       swerveSubsystem.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
+
     }
 
 
-    private void CheckStateMachineInitialOrientationStage(){
+    private void CheckStateMachineMovingAndRottingStage(){
 
-      boolean isInRange = Math.abs(targetPosData[4]) < 4;
+      boolean isInCorrectPosition = Math.abs(desiredRotationOffset - targetPosData[4]) < 4;
+      isInCorrectPosition = isInCorrectPosition && (Math.abs(desiredXOffset - targetPosData[0]) < 0.0254);
+      isInCorrectPosition = isInCorrectPosition && (Math.abs(desiredZOffset + targetPosData[2]) < 0.0254);
 
-      if(isInRange){
-        if(generalTimer.get() > 0.75){
-          SwitchToState(CenteringStates.MOVING_TOWARDS_POINT);
+      if(isInCorrectPosition){
+        Crashboard.toDashboard("Is in correct position:", generalTimer.get(), "Limelight");
+        if(generalTimer.get() > 0.1){
+          SwitchToState(CenteringStates.IDLE);
         }
       }else{
         generalTimer.reset();
       }
-    }
-
-    private void CheckStateMachineMovingTopositionStage(){
-
-      boolean isInRange = Math.abs(targetPosData[0]) < 0.009;
-
-      if(isInRange){
-        if(generalTimer.get() > 0.75){
-          SwitchToState(CenteringStates.INITIAL_ORIENTATION);
-        }
-      }else{
-        generalTimer.reset();
-      }
-    }
-
-
-    private void RetrieveDataFromTables(){
-      targetPosData = targetPoseTable.getDoubleArray(new double[6]);
     }
 
 
@@ -188,15 +197,15 @@ public class LimelightCenterOnAprilTag extends Command {
       generalTimer.start();
     }
 
-    private void MovingToPoint(){
+    private double[] MovingToPoint(){
 
         double targetXOffset = targetPosData[0];
-        targetXOffset = xMovementFilter.calculate(targetXOffset);
 
-   //     double targetYOffset = data[1];
-    //    double targetZOffset = data[2];
+        targetXOffset = desiredXOffset - targetXOffset;
 
-   //     Crashboard.toDashboard("Tz: ", targetZOffset, "Limelight");
+        double targetYOffset = targetPosData[2];
+        //  Make it go to desiredZOffset meters away
+        targetYOffset = desiredZOffset + targetYOffset;
 
         Crashboard.toDashboard("Tx: ", targetPosData[0], "Limelight");
         Crashboard.toDashboard("Ty: ", targetPosData[1], "Limelight");
@@ -205,70 +214,60 @@ public class LimelightCenterOnAprilTag extends Command {
         Crashboard.toDashboard("Yaw: ", targetPosData[4], "Limelight");
         Crashboard.toDashboard("Roll: ", targetPosData[5], "Limelight");
 
-
-    //    YmovementPid.setPID(kpMovementNetworkEntry.get(), kiMovementNetworkEntry.get(), kdMovementNetworkEntry.get());
-
         
-        double ySpeed = -YmovementPid.calculate(targetXOffset);
+        double ySpeed = -YmovementPid.calculate(targetXOffset, 0);
+        double xSpeed = -XmovementPid.calculate(targetYOffset, 0);
 
-        ySpeed = Math.min(2, ySpeed);
 
-       
-        //  The speeds are negative because the robot is programmed to have the front be the back
-        ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(0, -ySpeed, 0, Rotation2d.fromDegrees(-swerveSubsystem.getHeading())); //from Field
-        swerveSubsystem.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
+        // ySpeed = Math.min(2, ySpeed) * angleMultiplier;
+        // xSpeed = Math.min(2, xSpeed) * angleMultiplier;
+
+        ySpeed = Math.min(0.8, ySpeed);
+        xSpeed = Math.min(0.8, xSpeed);
+        ySpeed = Math.max(-0.8, ySpeed);
+        xSpeed = Math.max(-0.8, xSpeed);
+
+
+        return new double[]{xSpeed, ySpeed};
+     //   return new double[]{0, 0};
     }
     
-  private void AimPerpindicularToAprilTag(){
-        // int newFilterValue = (int)filterTapsNetworkEntry.get();
-        // if(newFilterValue != filterTaps){
-        //      filterTaps = newFilterValue; 
-        //      filter = LinearFilter.movingAverage(filterTaps);
-        // }
+ /*  private double AimPerpindicularToAprilTag(){
 
         double angleDifference = targetPosData[4];
-        angleDifference = rot2Filter.calculate(angleDifference);
 
-        //  Disabling because advantage scope keeps setting my stuff to 0
-   //     rot2Pid.setPID(kpRot2NetworkEntry.get(), kiRot2NetworkEntry.get(), kdRot2NetworkEntry.get());
+        angleDifference = desiredRotationOffset - angleDifference;
 
 
         Crashboard.toDashboard("Perp angle difference: ", angleDifference, "Limelight");
 
        double speedRadiansPerSecond = -rot2Pid.calculate(angleDifference, 0);
+       speedRadiansPerSecond *= 0.9;
 
        desiredSpeedPub.set(speedRadiansPerSecond);
        
-       ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(0, 0, speedRadiansPerSecond, Rotation2d.fromDegrees(-swerveSubsystem.getHeading())); //from Field
-       swerveSubsystem.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
-    }
-
-    //  Aims directly to the april tag
-   /*  private void AimTowardsAprilTag(){
-        // int newFilterValue = (int)filterTapsNetworkEntry.get();
-        // if(newFilterValue != filterTaps){
-        //      filterTaps = newFilterValue; 
-        //      filter = LinearFilter.movingAverage(filterTaps);
-        // }
-
-        double angleDifference = limelightSubsystem.GetGoofyAhhHeading();
-        angleDifference = rotationFilter.calculate(angleDifference);
-
-        rotationPid.setPID(kpRotationNetworkEntry.get(), kiRotationNetworkEntry.get(), kdRotationNetworkEntry.get());
-
-
-        Crashboard.toDashboard("Angle: ", angleDifference, "Limelight");
-
-        anglePub.set(angleDifference);
-
-        double speedRadiansPerSecond = -rotationPid.calculate(angleDifference, 0);
-
-        desiredSpeedPub.set(speedRadiansPerSecond);
-       
-        ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(0, 0, speedRadiansPerSecond, Rotation2d.fromDegrees(-swerveSubsystem.getHeading())); //from Field
-        swerveSubsystem.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
+      return speedRadiansPerSecond;
     }*/
 
+
+    private double AimTowardsAprilTag(){
+      
+      double angleDifference = limelightSubsystem.GetGoofyAhhHeading();
+      angleDifference = rotationFilter.calculate(angleDifference);
+
+      double speedRadiansPerSecond = -rotationPid.calculate(angleDifference, 0);
+
+      return speedRadiansPerSecond;
+  }
+
+    private void RetrieveDataFromTables(){
+      targetPosData = targetPoseTable.getDoubleArray(new double[6]);
+      targetPosData[0] = xMovementFilter.calculate(targetPosData[0]);
+      targetPosData[2] = yMovementFilter.calculate(targetPosData[2]);
+      targetPosData[4] = rot2Filter.calculate(targetPosData[4]);
+    }
+
+    
     @Override
     public boolean isFinished() {
         return false;
