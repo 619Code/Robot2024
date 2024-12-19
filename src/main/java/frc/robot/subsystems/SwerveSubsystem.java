@@ -137,15 +137,18 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     
     public void zeroHeading() {
-        gyro.reset();
-        gyroSim.resetData();
+        if (Robot.isReal()) {
+            gyro.reset();
+        } else {
+            gyroSim.resetData();            
+        }
     }
 
     public double getHeading() {
         if (Robot.isReal()) {
             return Math.IEEEremainder(gyro.getAngle(), 360);
         } else {
-            return Math.IEEEremainder(gyroSim.getAngle(), 360);
+            return Math.IEEEremainder(gyroSim.getAngle(), 180);
         }
     }
 

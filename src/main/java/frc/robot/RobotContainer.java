@@ -1,20 +1,23 @@
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
-
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoCommands.AutoShootCommand;
 import frc.robot.commands.AutoCommands.FollowTrajectoryCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
@@ -38,6 +41,7 @@ import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.AutoSwitchBoardSub;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
+import frc.robot.subsystems.ManipulatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ledSubsystem;
 
@@ -54,8 +58,8 @@ public class RobotContainer {
     //private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     //private final TestHingeSubsystem testHingeSubsystem = new TestHingeSubsystem();
     private final HingeSubsystem hingeSubsystem = new HingeSubsystem();
-    //private final Joystick driverOne = new Joystick(0);
-    private final CommandXboxController controller = new CommandXboxController(0);
+    private Joystick joystick; 
+    private CommandXboxController xBoxController;
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
@@ -74,6 +78,7 @@ public class RobotContainer {
     public static final boolean enableGroundIntake    = false;
     public static final boolean enableAutoSwitchBoard = true;
     public static final boolean enableLEDs            = true;
+    public static final boolean useXboxController     = false;
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -150,58 +155,73 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
 
-        if (enableDrivetrain) {
-            swerveSubsystem.setDefaultCommand(new SwerveCommand(
-                swerveSubsystem, 
-                () -> {return axisSmoother(-controller.getLeftY());}, // dx
-                () -> {return axisSmoother(-controller.getLeftX());}, // dy
-                () -> {return axisSmoother(controller.getRightX());}, //domega
-                (BooleanSupplier)controller.rightBumper(), // slow mode
-                (BooleanSupplier)controller.leftStick() // reorient
-            ));
+        
 
-            // swerveSubsystem.setDefaultCommand(new SwerveCommand(
-            //     swerveSubsystem, 
-            //     () -> {return controller.a().getAsBoolean() ? 0.5 : 0.0;}, // dx
-            //     () -> {return 0.0;}, // dy
-            //     () -> {return 0.0;}, //domega
-            //     (BooleanSupplier)controller.rightBumper(), // slow mode
-            //     (BooleanSupplier)controller.leftStick() // reorient
-            // ));
+        if (enableDrivetrain) {
+            if (useXboxController)
+            {
+                xBoxController = new CommandXboxController(0);
+            
+                swerveSubsystem.setDefaultCommand(new SwerveCommand(
+                    swerveSubsystem, 
+                    () -> {return axisSmoother(-xBoxController.getLeftY());}, // dx
+                    () -> {return axisSmoother(-xBoxController.getLeftX());}, // dy
+                    () -> {return axisSmoother(xBoxController.getRightX());}, //domega
+                    (BooleanSupplier)xBoxController.rightBumper(), // slow mode
+                    (BooleanSupplier)xBoxController.leftStick() // reorient
+                ));
+            }
+            else
+            {
+                this.joystick = new Joystick(0);                
+                swerveSubsystem.setDefaultCommand(new SwerveCommand(
+                    swerveSubsystem, 
+                    () -> {
+                        return axisSmoother(joystick.getRawAxis(Joystick.kDefaultXChannel));
+                    }, // dx
+                    () -> {
+                        return axisSmoother(joystick.getRawAxis(Joystick.kDefaultYChannel));
+                    }, // dy
+                    () -> {
+                        return axisSmoother(joystick.getRawAxis(Joystick.kDefaultTwistChannel));
+                    }, //domega
+                    () -> {
+                        return joystick.getRawButton(1);
+                    }, // slow mode
+                    () -> { 
+                        return joystick.getRawButton(2);
+                    } // reorient
+                ));
+            }
         }
 
         if (enableHinge) {
-            hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
-                
+
+            Trigger intakePosition = useXboxController ? xBoxController.y() : new Trigger(() -> joystick.getRawButton(3));
+            Trigger ampPosition = useXboxController ? xBoxController.a() : new Trigger(() -> joystick.getRawButton(4));
+            Trigger testHingePosition = useXboxController ? xBoxController.b() : new Trigger(() -> { return joystick.getRawButton(5);});
     
-            controller.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-            controller.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
-                
-            controller.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-            controller.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
-
-            //controller.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
-            controller.b().whileTrue(new TestHingeCommand(hingeSubsystem, controller));
-
-            //controller.rightTrigger().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-
-            controller.x().whileTrue(new GoToTrussPosCommand(hingeSubsystem));
-            Trigger strongClimbTrigger = controller.x();
-            strongClimbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
+            intakePosition.whileTrue(new GoToInakePosCommand(hingeSubsystem));
+            ampPosition.whileTrue(new GoToAmpPosCommand(hingeSubsystem));
             
+            DoubleSupplier testHingeSupplier = useXboxController ? () -> {return axisSmoother(xBoxController.getRightY());} : () -> { return joystick.getRawAxis(Joystick.kDefaultYChannel);};
+
+            testHingePosition.whileTrue(new TestHingeCommand(hingeSubsystem, testHingeSupplier));
+            
+            //trussPosition.whileTrue(new GoToTrussPosCommand(hingeSubsystem));
         }
 
         if (enableManipulator) {
             //  =========   MANIPULATOR BINDINGS   =========
-            Trigger shooTrigger = controller.leftTrigger();
+            Trigger shooTrigger = useXboxController ? xBoxController.leftTrigger() : new Trigger(() -> joystick.getRawButton(8));
             shooTrigger.onTrue(new ShootCommand(manipulatorSubsystem));
             shooTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-            Trigger intakeTrigger = controller.y();
+            Trigger intakeTrigger = useXboxController ? xBoxController.y() : new Trigger(() -> joystick.getRawButton(10));
             intakeTrigger.onTrue(new IntakeCommand(manipulatorSubsystem));
             intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-            Trigger outtakeTrigger = controller.rightTrigger();
+            Trigger outtakeTrigger = useXboxController ? xBoxController.rightTrigger() : new Trigger(() -> joystick.getRawButton(9));
             outtakeTrigger.whileTrue(new OuttakeCommand(manipulatorSubsystem));
 
         }
@@ -219,8 +239,8 @@ public class RobotContainer {
 
         if (enableClimb)
         {
-            Trigger upClimbTrigger = controller.back();
-            Trigger downClimbTrigger = controller.start();
+            Trigger upClimbTrigger = useXboxController ? xBoxController.back() : new Trigger(() -> joystick.getRawButton(7));
+            Trigger downClimbTrigger = useXboxController ? xBoxController.start() : new Trigger(() -> joystick.getRawButton(6));
 
             upClimbTrigger.onTrue(new ClimbCommandUp(climbSubsystem));
             upClimbTrigger.onTrue(new ClimbWithArmCommand(hingeSubsystem));
