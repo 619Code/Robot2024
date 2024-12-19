@@ -148,7 +148,7 @@ public class SwerveSubsystem extends SubsystemBase {
         if (Robot.isReal()) {
             return Math.IEEEremainder(gyro.getAngle(), 360);
         } else {
-            return Math.IEEEremainder(gyroSim.getAngle(), 180);
+            return Math.IEEEremainder(gyroSim.getAngle(), 360);
         }
     }
 

@@ -125,6 +125,7 @@ public class SwerveModule {
         absoluteEncoder.getConfigurator().apply(canCoderConfiguration);
 
         driveMotor = new CANSparkMax(driveMotorId, MotorType.kBrushless);
+        
         configureMotor(driveMotor, driveMotorReversed);
         turningMotor = new CANSparkMax(turningMotorId, MotorType.kBrushless);
         configureMotor(turningMotor, turningMotorReversed);
