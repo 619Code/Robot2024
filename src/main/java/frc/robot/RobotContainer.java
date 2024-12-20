@@ -27,12 +27,10 @@ import frc.robot.commands.ShooterCommands.ClimbWithArmCommandDown;
 import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
 import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
-import frc.robot.commands.ShooterCommands.GoToTrussPosCommand;
 import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.commands.ShooterCommands.OuttakeCommand;
 import frc.robot.commands.ShooterCommands.ShootCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
-import frc.robot.commands.Unused.TestHingeCommand;
 import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
 import frc.robot.subsystems.AutoSwitchBoardSub;
@@ -59,7 +57,7 @@ public class RobotContainer {
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
-    private final ledSubsystem LEDs = new ledSubsystem();        
+    private final ledSubsystem LEDs = new ledSubsystem();
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +85,7 @@ public class RobotContainer {
                 //just shoot speaker
                 break;
             }
-                
+
 
             case FORWARD_SIDE:
             {
@@ -122,11 +120,11 @@ public class RobotContainer {
                     Units.Meters.of(6.661),
                     Rotation2d.fromDegrees(-120)
                 ));
-                
+
                 //shoot and taxi
                 break;
             }
-        
+
             case DO_NOTHING:
             default:
             {
@@ -141,7 +139,7 @@ public class RobotContainer {
         double deadband = 0.1;
         if (Math.abs(axis) < deadband) {
             return 0.0;
-        } 
+        }
 
         // x^2
         return axis * axis * Math.signum(axis);
@@ -152,70 +150,33 @@ public class RobotContainer {
 
         if (enableDrivetrain) {
             swerveSubsystem.setDefaultCommand(new SwerveCommand(
-                swerveSubsystem, 
+                swerveSubsystem,
                 () -> {return axisSmoother(-controller.getLeftY());}, // dx
                 () -> {return axisSmoother(-controller.getLeftX());}, // dy
                 () -> {return axisSmoother(controller.getRightX());}, //domega
                 (BooleanSupplier)controller.rightBumper(), // slow mode
                 (BooleanSupplier)controller.leftStick() // reorient
             ));
-
-            // swerveSubsystem.setDefaultCommand(new SwerveCommand(
-            //     swerveSubsystem, 
-            //     () -> {return controller.a().getAsBoolean() ? 0.5 : 0.0;}, // dx
-            //     () -> {return 0.0;}, // dy
-            //     () -> {return 0.0;}, //domega
-            //     (BooleanSupplier)controller.rightBumper(), // slow mode
-            //     (BooleanSupplier)controller.leftStick() // reorient
-            // ));
         }
 
         if (enableHinge) {
             hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
-                
-    
+
             controller.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
             controller.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
-                
-            controller.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-            controller.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
-
-            //controller.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
-            controller.b().whileTrue(new TestHingeCommand(hingeSubsystem, controller));
-
-            //controller.rightTrigger().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-
-            controller.x().whileTrue(new GoToTrussPosCommand(hingeSubsystem));
-            Trigger strongClimbTrigger = controller.x();
-            strongClimbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
-            
+            controller.x().whileTrue(new ClimbWithArmCommand(hingeSubsystem));
         }
 
         if (enableManipulator) {
             //  =========   MANIPULATOR BINDINGS   =========
-            Trigger shooTrigger = controller.leftTrigger();
-            shooTrigger.onTrue(new ShootCommand(manipulatorSubsystem));
-            shooTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+            controller.leftTrigger().onTrue(new ShootCommand(manipulatorSubsystem));
+            controller.leftTrigger().onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-            Trigger intakeTrigger = controller.y();
-            intakeTrigger.onTrue(new IntakeCommand(manipulatorSubsystem));
-            intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+            controller.y().onTrue(new IntakeCommand(manipulatorSubsystem));
+            controller.y().onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-            Trigger outtakeTrigger = controller.rightTrigger();
-            outtakeTrigger.whileTrue(new OuttakeCommand(manipulatorSubsystem));
-
+            controller.rightTrigger().whileTrue(new OuttakeCommand(manipulatorSubsystem));
         }
-
-        // if (enableClimb && false) {
-        //     Trigger newClimbTrigger = controller.back();
-
-        //      newClimbTrigger.onTrue(new ClimbCommand(climbSubsystem));
-        //      newClimbTrigger.onFalse(new ClimbCommand(climbSubsystem));
-            
-        //     if (enableHinge) {
-        //         newClimbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
-        //     }
-        // }
 
         if (enableClimb)
         {
@@ -229,24 +190,19 @@ public class RobotContainer {
             downClimbTrigger.onTrue(new SequentialCommandGroup(new WaitCommand(.75), new ClimbWithArmCommandDown(hingeSubsystem)));
         }
 
-        if (enableGroundIntake) {
-            // Trigger intakeTrigger = controller.rightTrigger();
-            // intakeTrigger.whileTrue(new GroundIntakeCommand(groundIntakeSubsystem));
-        }
-
         if (enableLEDs) {
             LEDs.setColor(0, 0, 255);
         }
-        
+
         //   =========   OTHER BINDINGS   =========
-    
+
     }
 
     public void configureForTeleop() {
         if (RobotContainer.enableHinge) {
             InitializeHinge(); // WHY is this done differently?!?!
         }
-      
+
         configureButtonBindings();
     }
 
@@ -259,7 +215,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand(Autos auto) {
-        // ally multiplier is used to set the proper direction for 
+        // ally multiplier is used to set the proper direction for
         //  red vs blue since they are mirrored
         int allyMultiplier = 1;
         Optional<Alliance> ally = DriverStation.getAlliance();
@@ -276,13 +232,13 @@ public class RobotContainer {
                 //just shoot speaker
                 return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
                     .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-                        new Rotation2d(0), 
+                        new Rotation2d(0),
                         new Rotation2d(0),
                         new Rotation2d(0),
                         new Rotation2d(0)}))
                     .andThen(new AutoShootCommand(manipulatorSubsystem));
             }
-                
+
 
             case FORWARD_SIDE:
             {
@@ -312,7 +268,7 @@ public class RobotContainer {
                 //shoot and taxi
                 return new FollowTrajectoryCommand("TestPath", swerveSubsystem, false);
             }
-        
+
             case DO_NOTHING:
             default:
             {
