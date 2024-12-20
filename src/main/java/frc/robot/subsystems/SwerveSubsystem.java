@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
@@ -11,14 +9,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +26,7 @@ import frc.robot.helpers.Crashboard;
 public class SwerveSubsystem extends SubsystemBase {
     public static final double MAX_VOLTAGE = 12.0;
     public final SwerveModule frontLeft;
-    public final SwerveModule frontRight; 
+    public final SwerveModule frontRight;
     public final SwerveModule backLeft;
     public final SwerveModule backRight;
     public final StructArrayPublisher<SwerveModuleState> publisher;
@@ -120,22 +115,22 @@ public class SwerveSubsystem extends SubsystemBase {
             .getStructArrayTopic("/SwerveCommanded", SwerveModuleState.struct).publish();
 
         publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-                
+
         // new Thread(() -> {
         //     try {
         //         Thread.sleep(1000);
         //         zeroHeading();
-                
-        //     } 
+
+        //     }
         //     catch (Exception e) {}
         // }).start();
 
         fieldSim = new Field2d();
         SmartDashboard.putData("Field", fieldSim);
         // This is incorrectly using a serial port as an analog port
-        
+
     }
-    
+
     public void zeroHeading() {
         gyro.reset();
         gyroSim.resetData();
@@ -157,7 +152,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         // Update our fake motors and gyro
         double dt = 0.02; // 20ms
-        
+
         frontLeft.updateSim(dt);
         frontRight.updateSim(dt);
         backLeft.updateSim(dt);
@@ -255,7 +250,7 @@ public class SwerveSubsystem extends SubsystemBase {
         new Thread(() -> {
             try {
                 zeroHeading();
-            } 
+            }
             catch (Exception e) {
             }
         }).start();
@@ -269,18 +264,18 @@ public class SwerveSubsystem extends SubsystemBase {
         // Reset all the things
         gyroSim.setAngle(initialPose.getRotation().getRadians());
         odometer.resetPosition(
-            initialPose.getRotation(), 
+            initialPose.getRotation(),
             new SwerveModulePosition[] {
                 frontLeft.getPosition(),
                 frontRight.getPosition(),
                 backLeft.getPosition(),
                 backRight.getPosition()
-            }, 
+            },
             initialPose);
         ResetRelativePositionEncoders(initialPose.getRotation());
         fieldSim.setRobotPose(initialPose);
     }
-    
 
-    
+
+
 }
