@@ -149,11 +149,19 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         if (enableDrivetrain) {
+            final boolean onLinux = System.getProperty("os.name").equals("Linux");
             swerveSubsystem.setDefaultCommand(new SwerveCommand(
                 swerveSubsystem,
                 () -> {return axisSmoother(-controller.getLeftY());}, // dx
                 () -> {return axisSmoother(-controller.getLeftX());}, // dy
-                () -> {return axisSmoother(controller.getRightX());}, //domega
+                () -> {
+                    // On Linux, the RightX and RightTrigger axes are swapped from Windows
+                    if (onLinux) {
+                        return axisSmoother(controller.getRightTriggerAxis());
+                    } else {
+                        return axisSmoother(controller.getRightX());
+                    }
+                }, //domega
                 (BooleanSupplier)controller.rightBumper(), // slow mode
                 (BooleanSupplier)controller.leftStick() // reorient
             ));
