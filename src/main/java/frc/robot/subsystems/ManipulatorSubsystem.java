@@ -8,6 +8,12 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -18,21 +24,25 @@ import frc.robot.Robot;
 import frc.robot.helpers.Crashboard;
 
 public class ManipulatorSubsystem extends SubsystemBase {
+    private final boolean enabled;
 
-    public final CANSparkMax intakeLeader;
-    public final CANSparkMax shooterLeader;
+    private final CANSparkMax intakeLeader;
+    private final CANSparkMax shooterLeader;
 
-    public final DigitalInput intakeProximitySensor;
+    private final DigitalInput intakeProximitySensor;
 
-    public final RelativeEncoder shooterEncoder;
+    private final RelativeEncoder shooterEncoder;
 
     private final DCMotorSim shooterSim;
     private final DCMotorSim intakeSim;
 
-    private PIDController shooterOnboardPID;
-    private SimpleMotorFeedforward shooterFeedforward;
+    private final PIDController shooterOnboardPID;
+    private final SimpleMotorFeedforward shooterFeedforward;
+    private final MutableMeasure<Velocity<Angle>> shooterRPMSetpoint = MutableMeasure.zero(Units.RPM);
 
-    public ManipulatorSubsystem() {
+    public ManipulatorSubsystem(boolean enabled) {
+        this.enabled = enabled;
+
         intakeLeader = new CANSparkMax(Constants.ManipulatorConstants.kIntakeLeaderPort, MotorType.kBrushless);
         intakeLeader.restoreFactoryDefaults();
         intakeLeader.setIdleMode(IdleMode.kBrake);
@@ -41,7 +51,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
         shooterLeader = new CANSparkMax(Constants.ManipulatorConstants.kShooterLeaderPort, MotorType.kBrushless);
         shooterLeader.restoreFactoryDefaults();
-        shooterLeader.setIdleMode(IdleMode.kBrake);        
+        shooterLeader.setIdleMode(IdleMode.kBrake);
         shooterLeader.setSmartCurrentLimit(35);
         shooterLeader.setInverted(Constants.ManipulatorConstants.kShooterLeaderInverted);
 
@@ -50,45 +60,32 @@ public class ManipulatorSubsystem extends SubsystemBase {
         shooterEncoder = this.shooterLeader.getEncoder();
 
         shooterSim = new DCMotorSim(
-            DCMotor.getNEO(1), 
+            DCMotor.getNEO(1),
             1.0,
             0.000418
         );
 
         intakeSim = new DCMotorSim(
-            DCMotor.getNEO(1), 
+            DCMotor.getNEO(1),
             1.0,
             0.000418
         );
 
-        this.initPIDs();
+        shooterOnboardPID = new PIDController(
+            Constants.ManipulatorConstants.SHOOTER_KP,
+            Constants.ManipulatorConstants.SHOOTER_KI,
+            Constants.ManipulatorConstants.SHOOTER_KD
+        );
+        shooterFeedforward = new SimpleMotorFeedforward(
+            Constants.ManipulatorConstants.SHOOTER_KS,
+            Constants.ManipulatorConstants.SHOOTER_KV,
+            Constants.ManipulatorConstants.SHOOTER_KA
+        );
 
+        shooterOnboardPID.setSetpoint(shooterRPMSetpoint.magnitude());
     }
 
-    public void setShooterSpeedByRPM(double speed) {
-        if (Robot.isReal()) {
-            speed = speed/60.0;
-            shooterLeader.setVoltage(shooterOnboardPID.calculate(speed) + shooterFeedforward.calculate(speed));
-        } else {
-            shooterSim.setInputVoltage(shooterOnboardPID.calculate(speed) + shooterFeedforward.calculate(speed));
-        }
-    }
-
-    public double getShooterRPM() {
-        if (Robot.isReal()) {
-            return shooterEncoder.getVelocity();
-        } else {
-            return shooterSim.getAngularVelocityRPM();
-        }
-        
-    }
-
-    public void initPIDs() {
-        shooterOnboardPID = new PIDController(Constants.ManipulatorConstants.SHOOTER_KP, Constants.ManipulatorConstants.SHOOTER_KI, Constants.ManipulatorConstants.SHOOTER_KD);
-        shooterFeedforward = new SimpleMotorFeedforward(Constants.ManipulatorConstants.SHOOTER_KS, Constants.ManipulatorConstants.SHOOTER_KV, Constants.ManipulatorConstants.SHOOTER_KA);
-    }
-
-    @Override 
+    @Override
     public void simulationPeriodic() {
         shooterSim.update(0.02);
         intakeSim.update(0.02);
@@ -96,52 +93,74 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        
         Crashboard.toDashboard("Sensor value: ", intakeProximitySensor.get(), "Manipulator");
         OurRobotState.hasNote = !intakeProximitySensor.get();
-    }
 
-    public double GetShooterVelocity(){
-        if (Robot.isReal()) {
-            return shooterEncoder.getVelocity();
-        } else {
-            return shooterSim.getAngularVelocityRPM();
+        // Update our PID controller
+        if (enabled) {
+            if (Robot.isReal()) {
+                shooterLeader.setVoltage(shooterOnboardPID.calculate(shooterEncoder.getVelocity()) + shooterFeedforward.calculate(shooterRPMSetpoint.magnitude()));
+            } else {
+                shooterSim.setInputVoltage(shooterOnboardPID.calculate(shooterSim.getAngularVelocityRPM()) + shooterFeedforward.calculate(shooterRPMSetpoint.magnitude()));
+            }
         }
     }
 
-    public void spintake(double speed) {
+    public Measure<Velocity<Angle>> getShooterRPM() {
         if (Robot.isReal()) {
-            intakeLeader.set(speed);
+            return Units.RPM.of(shooterEncoder.getVelocity());
         } else {
-            intakeSim.setInputVoltage(speed * RobotController.getBatteryVoltage());
+            return Units.RPM.of(shooterSim.getAngularVelocityRPM());
         }
     }
 
-    public void spintakeVoltage(double voltage) {
-        if (Robot.isReal()) {
-            intakeLeader.setVoltage(voltage);
-        } else {
-            intakeSim.setInputVoltage(voltage);
+    public void setShooterRPM(Measure<Velocity<Angle>> velocity) {
+        if (enabled) {
+            // Update the setpoint. The actual motor is controlled
+            // in the periodic loop so we get continous feedback
+            shooterRPMSetpoint.mut_replace(velocity);
+            shooterOnboardPID.setSetpoint(shooterRPMSetpoint.magnitude());
         }
     }
 
-    public void spinShooterVoltage(double voltage) {
-        if (Robot.isReal()) {
-            shooterLeader.setVoltage(voltage);
-        } else {
-            shooterSim.setInputVoltage(voltage);
+    public void setShooterVoltage(Measure<Voltage> voltage) {
+        if (enabled) {
+            if (Robot.isReal()) {
+                shooterLeader.setVoltage(voltage.magnitude());
+            } else {
+                shooterSim.setInputVoltage(voltage.magnitude());
+            }
         }
     }
 
-    public void spinShooter(double speed) {
-        if (Robot.isReal()) {
-            shooterLeader.set(speed);
-        } else {
-            shooterSim.setInputVoltage(speed * RobotController.getBatteryVoltage());
+    /**
+     * @param value Should be [-1.0, 1.0]
+     */
+    public void setIntakePercentOut(double value) {
+        if (Math.abs(value) > 1.0) {
+            System.err.println(String.format("WARNING! Value of %d exceeds [-1.0, 1.0] bounds!", value));
+        }
+
+        if (enabled) {
+            if (Robot.isReal()) {
+                intakeLeader.set(value);
+            } else {
+                intakeSim.setInputVoltage(value * RobotController.getBatteryVoltage());
+            }
         }
     }
 
-    public boolean intakeTrigged() {
+    public void setIntakeVoltage(Measure<Voltage> voltage) {
+        if (enabled) {
+            if (Robot.isReal()) {
+                intakeLeader.setVoltage(voltage.magnitude());
+            } else {
+                intakeSim.setInputVoltage(voltage.magnitude());
+            }
+        }
+    }
+
+    public boolean isIntakeTriggered() {
         return !intakeProximitySensor.get();
     }
 
@@ -164,5 +183,5 @@ public class ManipulatorSubsystem extends SubsystemBase {
     public void stopAll(){
         intakeLeader.stopMotor();
         shooterLeader.stopMotor();
-    }  
+    }
 }

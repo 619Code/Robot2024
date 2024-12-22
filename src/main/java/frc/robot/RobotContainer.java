@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AutoCommands.AutoShootCommand;
 import frc.robot.commands.AutoCommands.FollowTrajectoryCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
@@ -49,15 +48,6 @@ enum Autos {
 
 public class RobotContainer {
 
-    //private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    //private final TestHingeSubsystem testHingeSubsystem = new TestHingeSubsystem();
-    private final HingeSubsystem hingeSubsystem = new HingeSubsystem();
-    //private final Joystick driverOne = new Joystick(0);
-    private final CommandXboxController controller = new CommandXboxController(0);
-    private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
-    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-    private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
-    private final ledSubsystem LEDs = new ledSubsystem();
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +65,14 @@ public class RobotContainer {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(enableDrivetrain);
+    private final HingeSubsystem hingeSubsystem = new HingeSubsystem();
+    //private final Joystick driverOne = new Joystick(0);
+    private final CommandXboxController controller = new CommandXboxController(0);
+    private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem(enableManipulator);
+    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+    private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
+    private final ledSubsystem LEDs = new ledSubsystem();
 
     public RobotContainer(Autos auto) {
 
@@ -135,6 +132,11 @@ public class RobotContainer {
         AutoSelector.setGyro(swerveSubsystem.getGyro());
     }
 
+    /**
+     * Helper function to smooth out controller input and adds a deadband.
+     * @param axis Value between [-1.0, 1.0] from a controller axis
+     * @return Smoothed value between [-1.0, 1.0]
+     */
     private double axisSmoother(double axis) {
         double deadband = 0.1;
         if (Math.abs(axis) < deadband) {
@@ -146,7 +148,7 @@ public class RobotContainer {
 
     }
 
-    private void configureButtonBindings() {
+    public void configureForTeleop() {
 
         if (enableDrivetrain) {
             final boolean onLinux = System.getProperty("os.name").equals("Linux");
@@ -168,6 +170,9 @@ public class RobotContainer {
         }
 
         if (enableHinge) {
+            // Reset the encoders first
+            new HingeInitializeCommand(hingeSubsystem).schedule();
+
             hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
 
             controller.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
@@ -203,23 +208,6 @@ public class RobotContainer {
         }
 
         //   =========   OTHER BINDINGS   =========
-
-    }
-
-    public void configureForTeleop() {
-        if (RobotContainer.enableHinge) {
-            InitializeHinge(); // WHY is this done differently?!?!
-        }
-
-        configureButtonBindings();
-    }
-
-    public SwerveSubsystem getSwerve() {
-        return swerveSubsystem;
-    }
-
-    public void InitializeHinge() {
-        new HingeInitializeCommand(hingeSubsystem).schedule();
     }
 
     public Command getAutonomousCommand(Autos auto) {
@@ -244,14 +232,14 @@ public class RobotContainer {
                         new Rotation2d(0),
                         new Rotation2d(0),
                         new Rotation2d(0)}))
-                    .andThen(new AutoShootCommand(manipulatorSubsystem));
+                    .andThen(new ShootCommand(manipulatorSubsystem));
             }
 
 
             case FORWARD_SIDE:
             {
                 return Commands.sequence(
-                    new AutoShootCommand(manipulatorSubsystem),
+                    new ShootCommand(manipulatorSubsystem),
                     new WaitCommand(1.0),
                     new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3)
                 );
@@ -262,7 +250,7 @@ public class RobotContainer {
 
                 //   Starting source side (automatically detects red or blue)
                 return Commands.sequence(
-                    new AutoShootCommand(manipulatorSubsystem),
+                    new ShootCommand(manipulatorSubsystem),
                     new WaitCommand(1.0),
                     new DriveToPointCommand(swerveSubsystem, -1.7, 1.0 * allyMultiplier, 0.3),
                     new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3),

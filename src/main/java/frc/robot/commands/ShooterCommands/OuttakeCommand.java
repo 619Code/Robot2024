@@ -4,36 +4,36 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.ManipulatorSubsystem;
 
-public class OuttakeCommand extends Command { 
+public class OuttakeCommand extends Command {
 
-    private ManipulatorSubsystem mani;
+    private ManipulatorSubsystem subsystem;
 
-    public OuttakeCommand(ManipulatorSubsystem pulator) {
-        mani = pulator;
-        addRequirements(mani);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        mani.stopAll();
-    }
-
-    @Override
-    public void execute() {
-        mani.spinShooter(-Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote * 0.5);
-        mani.spintake(-Constants.ManipulatorConstants.intakeSpeedWhenOuttaking * 0.5);
+    public OuttakeCommand(ManipulatorSubsystem subsystem) {
+        this.subsystem = subsystem;
+        addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
-        //
+        subsystem.setShooterRPM(Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote.times(-0.5));
+        subsystem.setIntakePercentOut(Constants.ManipulatorConstants.intakePercentOutWhenOuttaking * -0.5);
+    }
+
+    @Override
+    public void execute() {
+        // We don't update anything, so ignore?
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        subsystem.stopAll();
     }
 
     @Override
     public boolean isFinished() {
-        return !mani.intakeTrigged();
+        return !subsystem.isIntakeTriggered();
     }
-    
-    
-    
+
+
+
 }

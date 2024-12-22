@@ -7,7 +7,7 @@ import frc.robot.subsystems.ManipulatorSubsystem;
 public class IntakeCommand extends Command{
 
     private ManipulatorSubsystem subsystem;
-    
+
     public IntakeCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
 
@@ -16,13 +16,14 @@ public class IntakeCommand extends Command{
 
     @Override
     public void initialize() {
-        subsystem.spintake(Constants.ManipulatorConstants.intakeSpeed); // test value plz change. NO! I WON'T!
+        // test value plz change.
+        // NO! I WON'T!
+        subsystem.setShooterRPM(Constants.ManipulatorConstants.shooterIntakingRPM);
     }
 
     @Override
     public boolean isFinished() {
-        System.out.println(subsystem.intakeTrigged());
-        return subsystem.intakeTrigged(); 
+        return subsystem.isIntakeTriggered();
     }
 
     @Override

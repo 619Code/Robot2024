@@ -1,5 +1,6 @@
 package frc.robot.commands.ShooterCommands;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.ManipulatorSubsystem;
@@ -7,7 +8,7 @@ import frc.robot.subsystems.ManipulatorSubsystem;
 public class DefaultShootCommand extends Command {
 
     private ManipulatorSubsystem subsystem;
-    
+
     public DefaultShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
 
@@ -16,25 +17,21 @@ public class DefaultShootCommand extends Command {
 
     @Override
     public void initialize() {
-        
+
     }
 
     @Override
     public void execute() {
-        if(subsystem.intakeTrigged()){
-
-            subsystem.setShooterSpeedByRPM(Constants.ManipulatorConstants.shooterIdleRPM);
-
+        if(subsystem.isIntakeTriggered()){
+            subsystem.setShooterRPM(Constants.ManipulatorConstants.shooterIdleRPM);
         }else{
-
             subsystem.stopShooter();
-
         }
     }
 
     @Override
     public boolean isFinished() {
-        return false; 
+        return false;
     }
 
     @Override

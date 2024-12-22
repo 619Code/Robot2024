@@ -1,8 +1,11 @@
 package frc.robot.commands.ShooterCommands;
 
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.helpers.Crashboard;
@@ -13,10 +16,9 @@ public class ShootCommand extends Command {
     private ManipulatorSubsystem subsystem;
     private boolean hasReachedVelocity = false;
 
-    private double outtakeSpeed;
-    private double intakeSpeed;
-    private int  RPMsRequiredForOuttake;
-    
+    private double intakePercentOut;
+    private Measure<Velocity<Angle>> RPMRequiredForOuttake;
+
     public ShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
 
@@ -27,40 +29,33 @@ public class ShootCommand extends Command {
     public void initialize() {
         if (OurRobotState.currentArmPosition == ArmPosEnum.AMP) {
 
- //           this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedAmp;
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
-            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
-            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote;
+            this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
+            this.RPMRequiredForOuttake = Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.SPEAKER) {
 
-            //this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeaker;
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
-            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
-            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
+            this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
+            this.RPMRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.LONG_SHOT) {
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
-            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
-            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote;
+            this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
+            this.RPMRequiredForOuttake = Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote;
         } else {
             // do nothing, no shooting!
-                // Shooter, no shooting!
-            this.outtakeSpeed = 0;
-            this.intakeSpeed = 0;
-            this.RPMsRequiredForOuttake = 0;
+            // Shooter, no shooting!
+            this.intakePercentOut = 0;
+            this.RPMRequiredForOuttake = Units.RPM.of(0);
         }
 
-        //subsystem.spinShooterVoltage(this.outtakeSpeed); // test value, make sure to change once we g
-        subsystem.setShooterSpeedByRPM(RPMsRequiredForOuttake);
+        subsystem.setShooterRPM(RPMRequiredForOuttake);
     }
 
     @Override
     public void execute() {
-        
-         Crashboard.toDashboard("shooter flywheel RPMS: ", subsystem.GetShooterVelocity(), "shooter");
 
-        if(subsystem.GetShooterVelocity()   >= this.RPMsRequiredForOuttake * 0.90){
+        Crashboard.toDashboard("shooter flywheel RPMS: ", subsystem.getShooterRPM().magnitude(), "shooter");
+
+        if(subsystem.getShooterRPM().gte(RPMRequiredForOuttake.times(0.9))){
 
             hasReachedVelocity = true;
 
@@ -68,14 +63,14 @@ public class ShootCommand extends Command {
 
         if(hasReachedVelocity){
 
-            subsystem.spintake(this.intakeSpeed);
+            subsystem.setIntakePercentOut(this.intakePercentOut);
 
         }
     }
 
     @Override
     public boolean isFinished() {
-        return false; 
+        return false;
     }
 
     @Override

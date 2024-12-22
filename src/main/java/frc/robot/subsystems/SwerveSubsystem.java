@@ -24,6 +24,8 @@ import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
 
 public class SwerveSubsystem extends SubsystemBase {
+    public final boolean enabled;
+
     public static final double MAX_VOLTAGE = 12.0;
     public final SwerveModule frontLeft;
     public final SwerveModule frontRight;
@@ -56,7 +58,9 @@ public class SwerveSubsystem extends SubsystemBase {
         30, 12, 30, 12, 30, 12, 30, 12
     };
 
-    public SwerveSubsystem() {
+    public SwerveSubsystem(boolean enabled) {
+        this.enabled = enabled;
+
         frontLeft = new SwerveModule(
             "Front Left",
             DriveConstants.kFrontLeftDriveMotorPort,
@@ -108,7 +112,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
-//MUST USE A / IN THE NAME OR DIE
+        // MUST USE A / IN THE NAME
         publisher_current = NetworkTableInstance.getDefault()
             .getStructArrayTopic("/SwerveMeasured", SwerveModuleState.struct).publish();
         publisher_desired = NetworkTableInstance.getDefault()
@@ -116,18 +120,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
         publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
 
-        // new Thread(() -> {
-        //     try {
-        //         Thread.sleep(1000);
-        //         zeroHeading();
-
-        //     }
-        //     catch (Exception e) {}
-        // }).start();
-
         fieldSim = new Field2d();
         SmartDashboard.putData("Field", fieldSim);
-        // This is incorrectly using a serial port as an analog port
 
     }
 
@@ -201,13 +195,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        frontLeft.setDesiredState(desiredStates[0]);
-        frontRight.setDesiredState(desiredStates[1]);
-        backLeft.setDesiredState(desiredStates[2]);
-        backRight.setDesiredState(desiredStates[3]);
-        publisher.set(desiredStates);
-        publisher_desired.set(desiredStates);
+        if (enabled) {
+            SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+            frontLeft.setDesiredState(desiredStates[0]);
+            frontRight.setDesiredState(desiredStates[1]);
+            backLeft.setDesiredState(desiredStates[2]);
+            backRight.setDesiredState(desiredStates[3]);
+            publisher.set(desiredStates);
+            publisher_desired.set(desiredStates);
+        }
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -247,13 +243,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void reorientMidMatch() {
-        new Thread(() -> {
-            try {
-                zeroHeading();
-            }
-            catch (Exception e) {
-            }
-        }).start();
+        zeroHeading();
     }
 
     public AHRS getGyro() {

@@ -6,7 +6,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.*;
 
 public final class Constants {
 
@@ -23,13 +24,13 @@ public final class Constants {
 
         public static final float topEncoderSoftLimit = 73;
         public static final float bottomEncoderSoftLimit = -0.01f;
-        
+
         public static final double kHingeP = 0.27; //UNTUNED
         public static final double kHingeI = 0; //UNTUNED
         public static final double kHingeD = 0; //UNTUNED
-        public static final double kHingeG = .14; 
-        public static final double kHingeV = 5.35; 
-        public static final double kHingeA = 0.0; 
+        public static final double kHingeG = .14;
+        public static final double kHingeV = 5.35;
+        public static final double kHingeA = 0.0;
         public static final double kHingeS = 0.0;
 
         public static final double kHingeMaxVelocityRadPerSecond = 0;
@@ -49,8 +50,8 @@ public final class Constants {
 
   public static final int CANdleid = 20;
     public static final class ModuleConstants {
-        // these constants should be correct for the current 4ki module we are using 
-        public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
+        // these constants should be correct for the current 4ki module we are using
+        public static final double kWheelDiameterMeters = Units.Meters.convertFrom(4, Units.Inch);
         public static final double kDriveMotorGearRatio = 1/6.75;
         public static final double kTurningMotorGearRatio = 1/21.0;
         public static final double kDriveEncoderRot2Meter = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters;
@@ -60,7 +61,7 @@ public final class Constants {
 
 
         // We may need to tune this for the PID turning
-        
+
         // we may need to tune it so this is not set in stone
         public static final double kPTurning = .01;
         public static final double kDTurning = 0;
@@ -71,13 +72,13 @@ public final class Constants {
 
     public static final class DriveConstants {
 
-        //Used for uh, idk. 
+        //Used for uh, idk.
         public static final double kNavxUnitsToMetersConversion = 19.4;
 
         // we need to update this // no longer needs to be updated: I measured from center of axle to center of axle
         //thse seem to be based off of the base dimensions
-        public static final double kTrackWidth = Units.inchesToMeters(21); 
-        public static final double kWheelBase = Units.inchesToMeters(21);
+        public static final double kTrackWidth = Units.Meters.convertFrom(21, Units.Inch);
+        public static final double kWheelBase = Units.Meters.convertFrom(21, Units.Inch);
 
         //This should be relative to the center, but still check documentation about how the grid is set up for swerve kinetics
             //Ive changed it. It looked wrong and I fixed it based on the coordinate system at https://hhs-team670.github.io/MustangLib/frc/team670/robot/utils/math/Translation2d.html
@@ -93,7 +94,7 @@ public final class Constants {
         public static final int kFrontLeftDriveMotorPort = 51; //motors updated
         public static final int kFrontLeftTurningMotorPort = 50; //motors updated
         public static final boolean kFrontLeftDriveMotorReversed = true; //re updated //updated
-        public static final boolean kFrontLeftTurningMotorReversed = true; //updated 
+        public static final boolean kFrontLeftTurningMotorReversed = true; //updated
         public static final int kFrontLeftDriveAbsoluteEncoderPort = 33; //updated
         public static final boolean kFrontLeftDriveAbsoluteEncoderReversed = false; //updated
         public static final double kFrontLeftDriveAbsoluteEncoderOffsetDeg = -.230225; //updated // they want this to be the negative of the reported values?
@@ -106,7 +107,7 @@ public final class Constants {
         public static final int kFrontRightTurningMotorPort = 57; //motors updated
         public static final boolean kFrontRightDriveMotorReversed = false; //updated
         public static final boolean kFrontRightTurningMotorReversed = true; //updated
-        public static final int kFrontRightDriveAbsoluteEncoderPort = 30; //updated 
+        public static final int kFrontRightDriveAbsoluteEncoderPort = 30; //updated
         public static final boolean kFrontRightDriveAbsoluteEncoderReversed = false; //updated
         public static final double kFrontRightDriveAbsoluteEncoderOffsetDeg = -0.261475; //updated, in degrees
         public static final SensorDirectionValue kFrontRightTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
@@ -135,27 +136,27 @@ public final class Constants {
         public static final double kBackRightDriveAbsoluteEncoderOffsetDeg = 0.397461; //updated, in degrees
         public static final SensorDirectionValue kBackRightTurningForwardDirection = SensorDirectionValue.CounterClockwise_Positive;
 
-        
+
         //NOTE: these are not used in actual code they are just used to define max based on physical contraints
-        //If you want to ignore these then change the limit on the max speeds manually 
+        //If you want to ignore these then change the limit on the max speeds manually
         //these seem to be mostly fine but we may need change some things
-        // also we need to change the physical dimensions of our base if we are going to use this 
+        // also we need to change the physical dimensions of our base if we are going to use this
         public static final double kPhysicalMaxSpeedMetersPerSecond = 5676.0 / 60.0 * ModuleConstants.kDriveEncoderRot2Meter; //4.47332629073 m/s
         public static final double kPhysicalMaxAngularSpeedDegreesPerSecond = 360; //2 * Math.PI; //kPhysicalMaxSpeedMetersPerSecond / Math.hypot(DriveConstants.kTrackWidth / 2.0, DriveConstants.kWheelBase / 2.0 * 3);
 
         //These are the variables that determine the max speeds of our swerve drive
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * (1); // Divide by 4 for slow testing. 
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * (1); // Divide by 4 for slow testing.
         public static final double kTeleDriveMaxAngularSpeedDegreesPerSecond = kPhysicalMaxAngularSpeedDegreesPerSecond * (0.75);
-        
+
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }
 
-    //these we can ignore for now since they are only for autonmous 
+    //these we can ignore for now since they are only for autonmous
     public static final class AutoConstants {
         public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
         public static final double kMaxAngularSpeedDegreesPerSecond = DriveConstants.kPhysicalMaxAngularSpeedDegreesPerSecond / 10;
-        
+
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularAccelerationDegreesPerSecondSquared = 45.0;
         public static final double kPXController = 1.5;
@@ -188,22 +189,28 @@ public final class Constants {
     public static final class ManipulatorConstants {
         public static final int kIntakeLeaderPort = 60;  //20;  Test bed  value
         public static final boolean kInakeLeaderInverted = false;
-        public static final int kShooterLeaderPort = 54; //10; TEst bed value
+        public static final int kShooterLeaderPort = 54; //10; Test bed value
         public static final boolean kShooterLeaderInverted = true;
 
-        public static final double intakeSpeed = 0.3;
-        public static final double intakeSpeedWhenOuttaking = 1;//0.6;
-        public static final double outtakeSpeedSpeaker = 1;
-        public static final double outtakeSpeedAmp = 1;
+        public static final double intakePercentOut = 0.3;
+        public static final double intakePercentOutWhenOuttaking = 1;//0.6;
+        public static final double outtakePercentOutSpeaker = 1;
+        public static final double outtakePercentOutAmp = 1;
+
+        public static final Measure<Velocity<Angle>> shooterIntakingRPM = Units.RPM.of(1500);
+        public static final Measure<Velocity<Angle>> shooterOuttakingRPM = Units.RPM.of(1000);//0.6;
+        public static final Measure<Velocity<Angle>> shooterSpeakerRPM = Units.RPM.of(1500);
+        public static final Measure<Velocity<Angle>> shooterAmpRPM = Units.RPM.of(1500);
+
 
         public static final double outtakeSpeedSpeakerVoltage = 12;
         public static final double outtakeSpeedAmpVoltage = 12;
 
         public static final int kIntakeSensorPort = 9;  //0f test bed value
 
-        public static final int speakerShooterVelocityToReachBeforeFeedingNote = 3500;//3000;
-        public static final int passerShooterVelocityToReachBeforeFeedingNote = 5000;//3000
-        public static final int ampShooterVelocityToReachBeforeFeedingNote = 2000;
+        public static final Measure<Velocity<Angle>> speakerShooterVelocityToReachBeforeFeedingNote = Units.RPM.of(3500);//3000;
+        public static final Measure<Velocity<Angle>> passerShooterVelocityToReachBeforeFeedingNote = Units.RPM.of(5000);//3000
+        public static final Measure<Velocity<Angle>> ampShooterVelocityToReachBeforeFeedingNote = Units.RPM.of(2000);
 
         //Shooter PID
         public static final double SHOOTER_KP = 0.0023237;
@@ -216,14 +223,15 @@ public final class Constants {
         public static final double SHOOTER_MAX_OUTPUT = 1;
         public static final double SHOOTER_MIN_OUTPUT = 0;
 
-        public static final double shooterIdleRPM = 1500;
-        
+        // Whoever decided to have two different Units classes needs help
+        public static final Measure<Velocity<Angle>> shooterIdleRPM = Units.RPM.of(1500.0);
+
     }
 
     public static final class ClimbConstants {
         public static final int kLeftArmForwardPort = 5;
         public static final int kLeftArmBackwardPort = 4;
-        
+
         public static final int kRightArmForwardPort = 3;
         public static final int kRightArmBackwardPort = 2;
     }
@@ -235,7 +243,7 @@ public final class Constants {
 
     public static final class SwitchboardConstants {
         public static final int diOnesPort  = 8;
-        public static final int diTwosPort  = 7;        
+        public static final int diTwosPort  = 7;
         public static final int diFoursPort = 6;
         public static final int diEightsPort = 5;
     }
@@ -244,4 +252,4 @@ public final class Constants {
         public static final int CANdleid = 40;
         public static final int ledCount = 200;
     }
-} 
+}
