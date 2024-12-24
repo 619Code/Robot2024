@@ -1,14 +1,12 @@
 package frc.robot.commands.ShooterCommands;
 
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.helpers.Crashboard;
+import frc.robot.helpers.NamedUnits.PercentOutput;
+import frc.robot.helpers.NamedUnits.RevolutionsPerMinute;
 import frc.robot.subsystems.ManipulatorSubsystem;
 
 public class ShootCommand extends Command {
@@ -16,8 +14,8 @@ public class ShootCommand extends Command {
     private ManipulatorSubsystem subsystem;
     private boolean hasReachedVelocity = false;
 
-    private double intakePercentOut;
-    private Measure<Velocity<Angle>> RPMRequiredForOuttake;
+    private PercentOutput intakePercentOut;
+    private RevolutionsPerMinute RPMRequiredForOuttake;
 
     public ShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
@@ -43,8 +41,8 @@ public class ShootCommand extends Command {
         } else {
             // do nothing, no shooting!
             // Shooter, no shooting!
-            this.intakePercentOut = 0;
-            this.RPMRequiredForOuttake = Units.RPM.of(0);
+            this.intakePercentOut = new PercentOutput(0);
+            this.RPMRequiredForOuttake = new RevolutionsPerMinute(0);
         }
 
         subsystem.setShooterRPM(RPMRequiredForOuttake);

@@ -22,6 +22,8 @@ import frc.robot.Constants;
 import frc.robot.OurRobotState;
 import frc.robot.Robot;
 import frc.robot.helpers.Crashboard;
+import frc.robot.helpers.NamedUnits.PercentOutput;
+import frc.robot.helpers.NamedUnits.RevolutionsPerMinute;
 
 public class ManipulatorSubsystem extends SubsystemBase {
     private final boolean enabled;
@@ -106,19 +108,19 @@ public class ManipulatorSubsystem extends SubsystemBase {
         }
     }
 
-    public Measure<Velocity<Angle>> getShooterRPM() {
+    public RevolutionsPerMinute getShooterRPM() {
         if (Robot.isReal()) {
-            return Units.RPM.of(shooterEncoder.getVelocity());
+            return new RevolutionsPerMinute(shooterEncoder.getVelocity());
         } else {
-            return Units.RPM.of(shooterSim.getAngularVelocityRPM());
+            return new RevolutionsPerMinute(shooterSim.getAngularVelocityRPM());
         }
     }
 
-    public void setShooterRPM(Measure<Velocity<Angle>> velocity) {
+    public void setShooterRPM(RevolutionsPerMinute rpm) {
         if (enabled) {
             // Update the setpoint. The actual motor is controlled
             // in the periodic loop so we get continous feedback
-            shooterRPMSetpoint.mut_replace(velocity);
+            shooterRPMSetpoint.mut_replace(rpm);
             shooterOnboardPID.setSetpoint(shooterRPMSetpoint.magnitude());
         }
     }
@@ -136,16 +138,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
     /**
      * @param value Should be [-1.0, 1.0]
      */
-    public void setIntakePercentOut(double value) {
-        if (Math.abs(value) > 1.0) {
-            System.err.println(String.format("WARNING! Value of %d exceeds [-1.0, 1.0] bounds!", value));
-        }
-
+    public void setIntakePercentOut(PercentOutput value) {
         if (enabled) {
             if (Robot.isReal()) {
-                intakeLeader.set(value);
+                intakeLeader.set(value.magnitude());
             } else {
-                intakeSim.setInputVoltage(value * RobotController.getBatteryVoltage());
+                intakeSim.setInputVoltage(value.magnitude() * RobotController.getBatteryVoltage());
             }
         }
     }

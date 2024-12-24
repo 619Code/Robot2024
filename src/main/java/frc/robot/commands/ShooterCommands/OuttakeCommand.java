@@ -16,7 +16,7 @@ public class OuttakeCommand extends Command {
     @Override
     public void initialize() {
         subsystem.setShooterRPM(Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote.times(-0.5));
-        subsystem.setIntakePercentOut(Constants.ManipulatorConstants.intakePercentOutWhenOuttaking * -0.5);
+        subsystem.setIntakePercentOut(Constants.ManipulatorConstants.intakePercentOutWhenOuttaking.times(-0.5));
     }
 
     @Override

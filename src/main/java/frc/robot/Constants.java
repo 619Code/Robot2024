@@ -7,6 +7,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.Units;
+import frc.robot.helpers.NamedUnits.PercentOutput;
+import frc.robot.helpers.NamedUnits.RevolutionsPerMinute;
 import edu.wpi.first.units.*;
 
 public final class Constants {
@@ -192,25 +194,24 @@ public final class Constants {
         public static final int kShooterLeaderPort = 54; //10; Test bed value
         public static final boolean kShooterLeaderInverted = true;
 
-        public static final double intakePercentOut = 0.3;
-        public static final double intakePercentOutWhenOuttaking = 1;//0.6;
-        public static final double outtakePercentOutSpeaker = 1;
-        public static final double outtakePercentOutAmp = 1;
+        public static final PercentOutput intakePercentOut = new PercentOutput(0.3);
+        public static final PercentOutput intakePercentOutWhenOuttaking = new PercentOutput(1);//0.6;
+        public static final PercentOutput outtakePercentOutSpeaker = new PercentOutput(1);
+        public static final PercentOutput outtakePercentOutAmp = new PercentOutput(1);
 
-        public static final Measure<Velocity<Angle>> shooterIntakingRPM = Units.RPM.of(1500);
-        public static final Measure<Velocity<Angle>> shooterOuttakingRPM = Units.RPM.of(1000);//0.6;
-        public static final Measure<Velocity<Angle>> shooterSpeakerRPM = Units.RPM.of(1500);
-        public static final Measure<Velocity<Angle>> shooterAmpRPM = Units.RPM.of(1500);
+        public static final RevolutionsPerMinute shooterIntakingRPM = new RevolutionsPerMinute(1500);
+        public static final RevolutionsPerMinute shooterOuttakingRPM = new RevolutionsPerMinute(1000);//0.6;
+        public static final RevolutionsPerMinute shooterSpeakerRPM = new RevolutionsPerMinute(1500);
+        public static final RevolutionsPerMinute shooterAmpRPM = new RevolutionsPerMinute(1500);
 
-
-        public static final double outtakeSpeedSpeakerVoltage = 12;
-        public static final double outtakeSpeedAmpVoltage = 12;
+        public static final Measure<Voltage> outtakeSpeedSpeakerVoltage = Units.Volts.of(12);
+        public static final Measure<Voltage> outtakeSpeedAmpVoltage = Units.Volts.of(12);
 
         public static final int kIntakeSensorPort = 9;  //0f test bed value
 
-        public static final Measure<Velocity<Angle>> speakerShooterVelocityToReachBeforeFeedingNote = Units.RPM.of(3500);//3000;
-        public static final Measure<Velocity<Angle>> passerShooterVelocityToReachBeforeFeedingNote = Units.RPM.of(5000);//3000
-        public static final Measure<Velocity<Angle>> ampShooterVelocityToReachBeforeFeedingNote = Units.RPM.of(2000);
+        public static final RevolutionsPerMinute speakerShooterVelocityToReachBeforeFeedingNote = new RevolutionsPerMinute(3500);//3000;
+        public static final RevolutionsPerMinute passerShooterVelocityToReachBeforeFeedingNote = new RevolutionsPerMinute(5000);//3000
+        public static final RevolutionsPerMinute ampShooterVelocityToReachBeforeFeedingNote = new RevolutionsPerMinute(2000);
 
         //Shooter PID
         public static final double SHOOTER_KP = 0.0023237;
@@ -223,8 +224,7 @@ public final class Constants {
         public static final double SHOOTER_MAX_OUTPUT = 1;
         public static final double SHOOTER_MIN_OUTPUT = 0;
 
-        // Whoever decided to have two different Units classes needs help
-        public static final Measure<Velocity<Angle>> shooterIdleRPM = Units.RPM.of(1500.0);
+        public static final RevolutionsPerMinute shooterIdleRPM = new RevolutionsPerMinute(1500.0);
 
     }
 
