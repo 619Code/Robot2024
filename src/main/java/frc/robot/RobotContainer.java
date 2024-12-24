@@ -32,7 +32,6 @@ import frc.robot.commands.ShooterCommands.ShootCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
 import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
-import frc.robot.subsystems.AutoSwitchBoardSub;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -71,7 +70,6 @@ public class RobotContainer {
     private final CommandXboxController controller = new CommandXboxController(0);
     private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem(enableManipulator);
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-    private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
     private final ledSubsystem LEDs = new ledSubsystem();
 
     public RobotContainer(Autos auto) {

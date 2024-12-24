@@ -15,14 +15,14 @@
       "degrees": 90
     }
   ],
-  "position": [0, 0, 0.1],
+  "position": [0, 0, 0.11],
   "cameras": [
     {
       "name": "Front Camera",
       "rotations": [
         {
           "axis": "y",
-          "degrees": 20
+          "degrees": 0
         }
       ],
       "position": [0.2, 0, 0.8],
