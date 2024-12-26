@@ -2,14 +2,13 @@ package frc.robot.commands.ShooterCommands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.jar.Manifest;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
@@ -23,7 +22,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 public class SimulateNoteCommand extends Command {
 
-    private final StructArrayPublisher<Pose3d> posePublisher;
+    private final StructArrayPublisher<Pose3d> trajectoryPublisher;
+    private final StructPublisher<Pose3d> notePublisher;
     private final SwerveSubsystem swerveSubsystem;
     private final HingeSubsystem hingeSubsystem;
     private final Timer timer;
@@ -36,8 +36,12 @@ public class SimulateNoteCommand extends Command {
         this.hingeSubsystem = hingeSubsystem;
         this.timer = new Timer();
 
-        posePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Note", Pose3d.struct).publish();
-        posePublisher.set(new Pose3d[0]);
+        trajectoryPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("NoteTrajectory", Pose3d.struct).publish();
+        trajectoryPublisher.set(new Pose3d[0]);
+
+        notePublisher = NetworkTableInstance.getDefault().getStructTopic("Note", Pose3d.struct).publish();
+        notePublisher.set(new Pose3d());
+
 
         // We intentionally don't call addRequirement here,
         // because we want this to run while those subsystems are executing other commands
@@ -141,7 +145,8 @@ public class SimulateNoteCommand extends Command {
 
         trajectory = caculateTrajectory(initialPose, initialVelocity);
 
-        posePublisher.set(Arrays.copyOfRange(trajectory, 0, 0));
+        trajectoryPublisher.set(Arrays.copyOfRange(trajectory, 0, 0));
+        notePublisher.set(trajectory[0]);
 
         timer.start();
     }
@@ -151,7 +156,8 @@ public class SimulateNoteCommand extends Command {
         // There may be an off by 1 here, but it looks close enough
         int index = (int)(timer.get() / dt);
         if (index < trajectory.length) {
-            posePublisher.set(Arrays.copyOfRange(trajectory, 0, index));
+            trajectoryPublisher.set(Arrays.copyOfRange(trajectory, 0, index));
+            notePublisher.set(trajectory[index]);
         }
     }
 
