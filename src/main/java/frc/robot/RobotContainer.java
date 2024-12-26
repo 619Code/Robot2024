@@ -4,7 +4,10 @@ import java.util.function.BooleanSupplier;
 
 import java.util.Optional;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,6 +32,7 @@ import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
 import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.commands.ShooterCommands.OuttakeCommand;
 import frc.robot.commands.ShooterCommands.ShootCommand;
+import frc.robot.commands.ShooterCommands.SimulateNoteCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
 import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
@@ -187,6 +191,18 @@ public class RobotContainer {
             controller.y().onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
             controller.rightTrigger().whileTrue(new OuttakeCommand(manipulatorSubsystem));
+
+            controller.b().onTrue(new SimulateNoteCommand(
+                new Pose3d(
+                    new Translation3d(5.0, 5.0, 0.5),
+                    new Rotation3d(
+                        0,
+                        Units.Radians.convertFrom(45, Units.Degrees),
+                        Units.Radians.convertFrom(45, Units.Degrees)
+                    )
+                ),
+                Units.MetersPerSecond.of(7.0)
+            ));
         }
 
         if (enableClimb)

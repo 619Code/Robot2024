@@ -1,6 +1,8 @@
 package frc.robot.commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
@@ -8,6 +10,7 @@ import frc.robot.helpers.Crashboard;
 import frc.robot.helpers.NamedUnits.PercentOutput;
 import frc.robot.helpers.NamedUnits.RevolutionsPerMinute;
 import frc.robot.subsystems.ManipulatorSubsystem;
+
 
 public class ShootCommand extends Command {
 

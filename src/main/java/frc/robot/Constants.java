@@ -189,6 +189,12 @@ public final class Constants {
     }
 
     public static final class ManipulatorConstants {
+        public static enum ArmTargets {
+            AMP,
+            SPEAKER,
+            SOURCE
+        }
+
         public static final int kIntakeLeaderPort = 60;  //20;  Test bed  value
         public static final boolean kInakeLeaderInverted = false;
         public static final int kShooterLeaderPort = 54; //10; Test bed value

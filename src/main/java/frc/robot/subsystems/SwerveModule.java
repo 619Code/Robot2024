@@ -73,14 +73,14 @@ public class SwerveModule {
         ) {
             NetworkTable table = NetworkTableInstance
                                     .getDefault()
-                                    .getTable("SwerveModuleTuning - " + moduleName);
-            
+                                    .getTable("/SwerveModuleTuning/" + moduleName);
+
             driveMomentSub = table.getDoubleTopic("DriveMoment").getEntry(driveMoment);
             turningMomentSub = table.getDoubleTopic("TurningMoment").getEntry(turningMoment);
             turningkPSub = table.getDoubleTopic("TurningMomementkP").getEntry(turningkP);
             turningkISub = table.getDoubleTopic("TurningMomementkI").getEntry(turningkI);
             turningkDSub = table.getDoubleTopic("TurningMomementkD").getEntry(turningkD);
-            
+
             // Publish once so they show up in the table
             driveMomentSub.set(driveMoment);
             turningMomentSub.set(turningMoment);
@@ -131,7 +131,7 @@ public class SwerveModule {
 
         driveEncoder = driveMotor.getEncoder();
         //turningEncoder = turningMotor.getEncoder();
-        
+
         driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveEncoderRot2Meter);
         driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
         //turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Deg);
@@ -140,7 +140,7 @@ public class SwerveModule {
         /* Tuning */
         moduleTuning = new SwerveModuleTuning(
             0.000418,
-            0.000418, 
+            0.000418,
             0.01,
             0.0,
             0.0,
@@ -148,8 +148,8 @@ public class SwerveModule {
         );
 
         turningPidController = new PIDController(
-            moduleTuning.getTurningkP(), 
-            moduleTuning.getTurningkI(), 
+            moduleTuning.getTurningkP(),
+            moduleTuning.getTurningkI(),
             moduleTuning.getTurningkD()
         );
         turningPidController.enableContinuousInput(-180, 180);
@@ -158,16 +158,16 @@ public class SwerveModule {
 
         // TODO: These numbers are bogus. Fix them!
         driveMotorSim = new DCMotorSim(
-            DCMotor.getNEO(1), 
-            1.0, // This is a n:m where n>m represents a reduction 
+            DCMotor.getNEO(1),
+            1.0, // This is a n:m where n>m represents a reduction
             moduleTuning.getDriveMoment() // This is the moment of inertia of the motor. This number is made up
         );
         turningMotorSim = new DCMotorSim(
-            DCMotor.getNEO(1), 
-            1.0 / ModuleConstants.kTurningMotorGearRatio, // This is a n:m where n>m represents a reduction 
+            DCMotor.getNEO(1),
+            1.0 / ModuleConstants.kTurningMotorGearRatio, // This is a n:m where n>m represents a reduction
             moduleTuning.getTurningMoment() // This is the moment of inertia of the motor. This number is made up
         );
-        
+
         resetEncoders();
     }
 
@@ -209,7 +209,7 @@ public class SwerveModule {
         }
 
         //should be in degrees???
-        // No. This should absolutely be in radians. I won't change it because I don't know the 
+        // No. This should absolutely be in radians. I won't change it because I don't know the
         // codebase very well yet, but we almost always convert back this value to radians
     }
 
@@ -230,13 +230,13 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState state) {
-        // Update the parameters 
+        // Update the parameters
         turningPidController.setPID(
-            moduleTuning.getTurningkP(), 
-            moduleTuning.getTurningkI(), 
+            moduleTuning.getTurningkP(),
+            moduleTuning.getTurningkI(),
             moduleTuning.getTurningkD()
         );
-        
+
 
         if (Math.abs(state.speedMetersPerSecond) < 0.01) {
             stop();
@@ -246,23 +246,23 @@ public class SwerveModule {
 
         // This is the jank line that we thought broke things earlier.
         //state.speedMetersPerSecond *= state.angle.minus(Rotation2d.fromDegrees(getAbsoluteEncoderDeg())).getCos();
-        
+
         // Calculate the drive output from the drive PID controller. ;}
         double driveSpeed = MathUtil.clamp(state.speedMetersPerSecond  / Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond/* / 360*/, -1 ,1);
-  
+
         driveMotor.set(driveSpeed);
         driveMotorSim.setInputVoltage(driveSpeed * RobotController.getBatteryVoltage());
 
         // Crashboard.toDashboard("driveSpeed", driveSpeed, "Swerve");
         // Crashboard.toDashboard("speed in m/s", state.speedMetersPerSecond, "Swerve");
-        
-                
+
+
         double turnSpeed = (turningPidController.calculate(getAbsoluteEncoderDeg(), state.angle.getDegrees()));
         if (turnSpeed > 0)
             turnSpeed = Math.min(turnSpeed, .2);
         else
             turnSpeed = Math.max(turnSpeed, -.2);
-        
+
 
         //
         turningMotor.set(turnSpeed);
