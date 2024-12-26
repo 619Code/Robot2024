@@ -17,8 +17,8 @@ public class DriveToPointCommand extends Command {
     private SwerveSubsystem swerve;
     private Pose2d firstPos, secondPos;
     private Transform2d dPos;
-    private double baseMaxSpeed, rotationMaxSpeed; 
-    private double calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed; 
+    private double baseMaxSpeed, rotationMaxSpeed;
+    private double calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed;
     private double dx, dy, dTheta;
     private boolean stickyX, stickyY, stickyR;
     private Trigger stop;
@@ -49,15 +49,15 @@ public class DriveToPointCommand extends Command {
 
         swerve = subsystem;
         dPos = new Transform2d(
-            new Translation2d(0, 0), 
+            new Translation2d(0, 0),
             Rotation2d.fromDegrees(changeInHeadingDegrees)
         );
-        
+
         baseMaxSpeed = Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * percentageOfMaxSpeed;
         rotationMaxSpeed = Constants.DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond * percentageOfMaxSpeed * percentageOfMaxSpeed;
 
         addRequirements(subsystem);
-    } 
+    }
 
     public DriveToPointCommand(SwerveSubsystem subsystem, double percentageOfMaxSpeed, Trigger stopTrigger) {
         stickyX = false;
@@ -81,7 +81,7 @@ public class DriveToPointCommand extends Command {
 
     @Override
     public void initialize() {
-        
+
         firstPos = swerve.getPose2d();
 
         secondPos = firstPos.transformBy(dPos);
@@ -103,19 +103,19 @@ public class DriveToPointCommand extends Command {
 
         xSecMax = dx / baseMaxSpeed;
         ySecMax = dy / baseMaxSpeed;
-        tSecMax = dTheta / rotationMaxSpeed;        
+        tSecMax = dTheta / rotationMaxSpeed;
 
         //  Get the longest of these times. In other words, the operation should be performed as fast as the slowest movement can go.
 
         double bottleneckTime = Math.max(Math.max(Math.abs(xSecMax), Math.abs(ySecMax)), Math.abs(tSecMax));
 
         calculatedXSpeed = dx / bottleneckTime; // literally meters / seconds
-        calculatedYSpeed = dy / bottleneckTime; 
+        calculatedYSpeed = dy / bottleneckTime;
         calculatedRotSpeed = dTheta / bottleneckTime;
 
         // Right now, the calculated X and Y speeds are in meters/second, and not scalar values between 0 and 1.
 
-        Rotation2d currentHeading = Rotation2d.fromDegrees(-swerve.getHeading()); //inverted
+        Rotation2d currentHeading = Rotation2d.fromDegrees(-swerve.getHeadingDegrees()); //inverted
 
         ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed, currentHeading); //from Field
         swerve.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
@@ -125,7 +125,7 @@ public class DriveToPointCommand extends Command {
     @Override
     public void execute() {
         //if (isFinished()) {end(true);}
-        ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed, Rotation2d.fromDegrees(-swerve.getHeading())); //from Field
+        ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(calculatedXSpeed, calculatedYSpeed, calculatedRotSpeed, Rotation2d.fromDegrees(-swerve.getHeadingDegrees())); //from Field
         swerve.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
     }
 

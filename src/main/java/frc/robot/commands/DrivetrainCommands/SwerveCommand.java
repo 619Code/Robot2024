@@ -20,7 +20,7 @@ public class SwerveCommand extends Command {
 
     private final SwerveSubsystem swerveSubsystem;
     private final DoubleSupplier getDx;
-    private final DoubleSupplier getDy; 
+    private final DoubleSupplier getDy;
     private final DoubleSupplier getDOmega;
     private final BooleanSupplier activateSlowMode;
     private final BooleanSupplier reorient;
@@ -29,7 +29,7 @@ public class SwerveCommand extends Command {
 
     public SwerveCommand(SwerveSubsystem swerveSubsystem, Joystick controller) {
         this(
-            swerveSubsystem, 
+            swerveSubsystem,
             () -> {return controller.getRawAxis(1);},
             () -> {return controller.getRawAxis(0);},
             () -> {return controller.getRawAxis(3);},
@@ -39,9 +39,9 @@ public class SwerveCommand extends Command {
     }
 
     public SwerveCommand(
-        SwerveSubsystem swerveSubsystem, 
-        DoubleSupplier dx, 
-        DoubleSupplier dy, 
+        SwerveSubsystem swerveSubsystem,
+        DoubleSupplier dx,
+        DoubleSupplier dy,
         DoubleSupplier domega,
         BooleanSupplier activateSlowMode,
         BooleanSupplier reorient
@@ -76,7 +76,7 @@ public class SwerveCommand extends Command {
         // end reorient
 
         boolean slowMode = activateSlowMode.getAsBoolean();
-        
+
         //double xSpeed = Math.abs(controller.getLeftY()) > OIConstants.kDeadband ? controller.getLeftY() : 0.0;
         double xSpeed = getDx.getAsDouble();
         if (Math.abs(xSpeed) <= Constants.OIConstants.kDeadband) {
@@ -90,20 +90,20 @@ public class SwerveCommand extends Command {
         if (slowMode) xSpeed *= slow;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         double ySpeed = getDy.getAsDouble();
         if (Math.abs(ySpeed) <= Constants.OIConstants.kDeadband) {
             ySpeed = 0;
         }
-        
+
         ySpeed = driveLimiterY.calculate(ySpeed);
-        
-        ySpeed = ySpeed * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;   
+
+        ySpeed = ySpeed * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
 
         if (slowMode) ySpeed *= slow;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         double turningSpeed = getDOmega.getAsDouble();
         if (Math.abs(turningSpeed) <= Constants.OIConstants.kDeadband) {
             turningSpeed = 0;
@@ -118,13 +118,13 @@ public class SwerveCommand extends Command {
         Crashboard.toDashboard("kTeleDriveMaxAngularSpeedDegreesPerSecond", DriveConstants.kTeleDriveMaxAngularSpeedDegreesPerSecond, "navx");
 
         double turningSpeedRadiansPerSecond = Rotation2d.fromDegrees(turningSpeed).getRadians();
-        Rotation2d currentHeading = Rotation2d.fromDegrees(-swerveSubsystem.getHeading()); //inverted
+        Rotation2d currentHeading = Rotation2d.fromDegrees(-swerveSubsystem.getHeadingDegrees()); //inverted
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeedRadiansPerSecond, currentHeading);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveSubsystem.getModuleStates(), Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond);
         swerveSubsystem.setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds));
         Crashboard.toDashboard("turningSpeedRadiansPerSecond", turningSpeedRadiansPerSecond, "navx");
         Crashboard.toDashboard("currentHeading", currentHeading.getRadians(), "navx");
-       
+
         //Crashboard.toDashboard("desired states", DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)[0].toString(), "navx");
     }
 

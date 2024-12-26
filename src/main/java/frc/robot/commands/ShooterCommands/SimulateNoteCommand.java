@@ -1,28 +1,22 @@
 package frc.robot.commands.ShooterCommands;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.jar.Manifest;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist3d;
-import edu.wpi.first.math.geometry.struct.Pose3dStruct;
-import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ManipulatorSubsystem;
+import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 // Based off the example code: https://github.com/Mechanical-Advantage/AdvantageKit/blob/18a0219f60108e3dc1e8512d59fcba0e657770af/example_projects/kitbot_2024/src/main/java/frc/robot/util/NoteVisualizer.javahttps://github.com/Mechanical-Advantage/AdvantageKit/blob/18a0219f60108e3dc1e8512d59fcba0e657770af/example_projects/kitbot_2024/src/main/java/frc/robot/util/NoteVisualizer.java
@@ -30,27 +24,34 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class SimulateNoteCommand extends Command {
 
     private final StructArrayPublisher<Pose3d> posePublisher;
+    private final SwerveSubsystem swerveSubsystem;
+    private final HingeSubsystem hingeSubsystem;
     private final Timer timer;
     private final double dt = 0.02;
 
     private Pose3d[] trajectory;
-    private final Pose3d initialPose;
-    private final Measure<Velocity<Distance>> initialVelocity;
 
-    public SimulateNoteCommand(Pose3d initialPose,  Measure<Velocity<Distance>> launchVelocity) {
+    public SimulateNoteCommand(SwerveSubsystem swerveSubsystem, HingeSubsystem hingeSubsystem) {
+        this.swerveSubsystem = swerveSubsystem;
+        this.hingeSubsystem = hingeSubsystem;
+        this.timer = new Timer();
+
         posePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Note", Pose3d.struct).publish();
         posePublisher.set(new Pose3d[0]);
 
-        this.initialPose = initialPose;
-        this.initialVelocity = launchVelocity;
-        this.timer = new Timer();
+        // We intentionally don't call addRequirement here,
+        // because we want this to run while those subsystems are executing other commands
     }
 
-    // public SimulateNoteCommand(SwerveSubsystem swerveSubsystem, ManipulatorSubsystem manipulatorSubsystem) {
+    private boolean withinField(Pose3d pose) {
+        return true;
+        // return  pose.getX() > 0 &&
+        //         pose.getY() > 0 &&
+        //         pose.getX() < Units.Meters.convertFrom(52, Units.Feet) &&
+        //         pose.getY() < Units.Meters.convertFrom(26, Units.Feet);
+    }
 
-    // }
-
-    private Pose3d[] caculateTrajectory(Pose3d initalPose, Measure<Velocity<Distance>> initialSpeed) {
+    private Pose3d[] caculateTrajectory(Pose3d initialPose, Measure<Velocity<Distance>> initialSpeed) {
         /*
          * Naive strategy:
          * 1. Move into the trajectory plane
@@ -63,13 +64,13 @@ public class SimulateNoteCommand extends Command {
          * v_x = v_0
          * v_y = v_0 - g*t
          */
-        double rz = initalPose.getRotation().getZ();
-        double ry = initalPose.getRotation().getY();
+        double rz = initialPose.getRotation().getZ();
+        double ry = initialPose.getRotation().getY();
         double v_x = initialSpeed.magnitude() * Math.cos(rz);
         double v_y = initialSpeed.magnitude() * Math.sin(rz);
         double v_z = initialSpeed.magnitude() * Math.cos(ry);
-        double x_0_x = initalPose.getX() * Math.cos(rz);
-        double x_0_z = initalPose.getZ();
+        double x_0_x = 0.0;
+        double x_0_z = initialPose.getZ();
 
 
         // Project the launch vector into the launch plane
@@ -87,18 +88,25 @@ public class SimulateNoteCommand extends Command {
             double x_t = x_0_x + horizontalMag*t;
             double z_t = x_0_z + verticalMag*t - 4.9*t*t;
 
-            trajectory.add(new Pose3d(
+            Pose3d pose = new Pose3d(
                 new Translation3d(
-                    Units.Meters.of(x_t * Math.cos(rz)),
-                    Units.Meters.of(x_t * Math.sin(rz)),
+                    Units.Meters.of(initialPose.getX()).plus(Units.Meters.of(x_t * Math.cos(rz))),
+                    Units.Meters.of(initialPose.getY()).plus(Units.Meters.of(x_t * Math.sin(rz))),
                     Units.Meters.of(z_t)
                 ),
                 new Rotation3d(
                     0,
                     -Math.atan2(verticalMag - 9.8*t, horizontalMag), // The axis of rotation for the note is different from how I'd have thought
-                    initalPose.getZ()
+                    initialPose.getZ()
                 )
-            ));
+            );
+
+            trajectory.add(pose);
+
+            // Our simple physics sim is to consider the note scored when it leaves the field
+            if (!withinField(pose)) {
+                break;
+            }
         }
 
         return (Pose3d[])trajectory.toArray(new Pose3d[trajectory.size()]);
@@ -106,6 +114,23 @@ public class SimulateNoteCommand extends Command {
 
     @Override
     public void initialize() {
+        // TODO: These use SPEAKER defaults for now, because
+        // the hinge isn't simulated/animated yet
+        Pose3d initialPose = new Pose3d(
+            new Translation3d(
+                swerveSubsystem.getPose2d().getX(),
+                swerveSubsystem.getPose2d().getY(),
+                0.5 // This should be 1 of two values depending on angle of the hinge
+            ),
+            new Rotation3d(
+                0,
+                Units.Radians.convertFrom(hingeSubsystem.getAbsoluteDegrees(), Units.Degrees),
+                Units.Radians.convertFrom(swerveSubsystem.getHeadingDegrees(), Units.Degrees)
+            )
+        );
+        // TODO: This is a guess. It will vary depending on AMP or SPEAKER
+        Measure<Velocity<Distance>> initialVelocity = Units.MetersPerSecond.of(10.0);
+
         trajectory = caculateTrajectory(initialPose, initialVelocity);
 
         posePublisher.set(Arrays.copyOfRange(trajectory, 0, 0));

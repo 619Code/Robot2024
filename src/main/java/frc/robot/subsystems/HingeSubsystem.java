@@ -25,7 +25,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     private final DutyCycleEncoder encoder;
     private double outVoltage = 0;
 
-    private RelativeEncoder hingeLeaderRelativeEncoder;     
+    private RelativeEncoder hingeLeaderRelativeEncoder;
     private RelativeEncoder hingeFollowerRelativeEncoder;
 
     private final ArmFeedforward ff;
@@ -37,11 +37,11 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
     public HingeSubsystem() {
         super(
             new ProfiledPIDController(
-                Constants.HingeConstants.kHingeP, 
-                Constants.HingeConstants.kHingeI, 
-                Constants.HingeConstants.kHingeD, 
+                Constants.HingeConstants.kHingeP,
+                Constants.HingeConstants.kHingeI,
+                Constants.HingeConstants.kHingeD,
                 new TrapezoidProfile.Constraints(
-                    Constants.HingeConstants.kHingeMaxVelocityRadPerSecond, 
+                    Constants.HingeConstants.kHingeMaxVelocityRadPerSecond,
                     Constants.HingeConstants.KHingeMaxAccelerationRadPerSecond)),
         Constants.HingeConstants.kShootingAngle);
 
@@ -149,14 +149,14 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
     public double getAbsoluteDegrees() {
         //return ((.87 - encoder.getAbsolutePosition())/.26) * (72) + (60);
-        return parseRawAbsEncoderValue(encoder.getAbsolutePosition(), 
-            Constants.HingeConstants.rawEncoderLow, 
-            Constants.HingeConstants.rawEncoderHigh, 
-            Constants.HingeConstants.degreesLow, 
+        return parseRawAbsEncoderValue(encoder.getAbsolutePosition(),
+            Constants.HingeConstants.rawEncoderLow,
+            Constants.HingeConstants.rawEncoderHigh,
+            Constants.HingeConstants.degreesLow,
             Constants.HingeConstants.degreesHigh);
     }
     public double parseRawAbsEncoderValue(double rawAbsoluteEncoderValue, double rawEncoderLow, double rawEncoderHigh, double degreesLow, double degreesHigh) {
-       
+
         return (rawAbsoluteEncoderValue-rawEncoderLow)/(rawEncoderHigh-rawEncoderLow)*(degreesHigh-degreesLow)+degreesLow;
 
     }
@@ -165,7 +165,7 @@ public class HingeSubsystem extends ProfiledPIDSubsystem {
 
         hingeLeader.setSoftLimit(SoftLimitDirection.kForward, upperLimit);
         hingeFollower.setSoftLimit(SoftLimitDirection.kForward, upperLimit);
-        
+
         hingeLeader.enableSoftLimit(SoftLimitDirection.kForward, true);
         hingeFollower.enableSoftLimit(SoftLimitDirection.kForward, true);
 

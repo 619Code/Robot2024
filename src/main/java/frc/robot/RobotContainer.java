@@ -193,15 +193,8 @@ public class RobotContainer {
             controller.rightTrigger().whileTrue(new OuttakeCommand(manipulatorSubsystem));
 
             controller.b().onTrue(new SimulateNoteCommand(
-                new Pose3d(
-                    new Translation3d(5.0, 5.0, 0.5),
-                    new Rotation3d(
-                        0,
-                        Units.Radians.convertFrom(45, Units.Degrees),
-                        Units.Radians.convertFrom(45, Units.Degrees)
-                    )
-                ),
-                Units.MetersPerSecond.of(7.0)
+                swerveSubsystem,
+                hingeSubsystem
             ));
         }
 

@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -130,16 +131,20 @@ public class SwerveSubsystem extends SubsystemBase {
         gyroSim.resetData();
     }
 
-    public double getHeading() {
+    // This really should return type Degrees, but we don't want
+    // to do an allocation each time.
+    public double getHeadingDegrees() {
         if (Robot.isReal()) {
             return Math.IEEEremainder(gyro.getAngle(), 360);
         } else {
+            System.out.println(gyroSim.getAngle());
             return Math.IEEEremainder(gyroSim.getAngle(), 360);
+            //return Math.IEEEremainder(Units.Degrees.convertFrom(gyroSim.getAngle(), Units.Radians), 360);
         }
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        return Rotation2d.fromDegrees(getHeadingDegrees());
     }
 
     @Override
@@ -153,9 +158,9 @@ public class SwerveSubsystem extends SubsystemBase {
         backRight.updateSim(dt);
 
         ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
-        double dOmega = chassisSpeeds.omegaRadiansPerSecond * dt;
-        gyroSim.setAngle(getHeading() + dOmega);
+        double dOmega = Units.Degrees.convertFrom(chassisSpeeds.omegaRadiansPerSecond * dt, Units.Radians);
 
+        gyroSim.setAngle(getHeadingDegrees() + dOmega);
     }
 
     // This runs in both simulation and real robot operations
@@ -174,7 +179,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // Crashboard.toDashboard("navx odometry pose x", odometer.getPoseMeters().getX(), "Odometry");
         // Crashboard.toDashboard("navx odometry pose y", odometer.getPoseMeters().getY(), "Odometry");
 
-        Crashboard.toDashboard("Robot Heading", getHeading(), "navx");
+        Crashboard.toDashboard("Robot Heading", getHeadingDegrees(), "navx");
         frontLeft.logIt();
         frontRight.logIt();
         backLeft.logIt();
@@ -252,7 +257,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void initializePose(Pose2d initialPose) {
         // Reset all the things
-        gyroSim.setAngle(initialPose.getRotation().getRadians());
+        gyroSim.setAngle(initialPose.getRotation().getDegrees());
         odometer.resetPosition(
             initialPose.getRotation(),
             new SwerveModulePosition[] {
@@ -265,7 +270,5 @@ public class SwerveSubsystem extends SubsystemBase {
         ResetRelativePositionEncoders(initialPose.getRotation());
         fieldSim.setRobotPose(initialPose);
     }
-
-
 
 }
