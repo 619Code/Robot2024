@@ -44,11 +44,10 @@ public class SimulateNoteCommand extends Command {
     }
 
     private boolean withinField(Pose3d pose) {
-        return true;
-        // return  pose.getX() > 0 &&
-        //         pose.getY() > 0 &&
-        //         pose.getX() < Units.Meters.convertFrom(52, Units.Feet) &&
-        //         pose.getY() < Units.Meters.convertFrom(26, Units.Feet);
+        return  pose.getX() > 0 &&
+                pose.getY() > 0 &&
+                pose.getX() < Units.Meters.convertFrom(52, Units.Feet) &&
+                pose.getY() < Units.Meters.convertFrom(26, Units.Feet);
     }
 
     private Pose3d[] caculateTrajectory(Pose3d initialPose, Measure<Velocity<Distance>> initialSpeed) {
@@ -66,9 +65,11 @@ public class SimulateNoteCommand extends Command {
          */
         double rz = initialPose.getRotation().getZ();
         double ry = initialPose.getRotation().getY();
-        double v_x = initialSpeed.magnitude() * Math.cos(rz);
-        double v_y = initialSpeed.magnitude() * Math.sin(rz);
-        double v_z = initialSpeed.magnitude() * Math.cos(ry);
+        double rx = initialPose.getRotation().getX();
+
+        double v_x = initialSpeed.magnitude() * Math.cos(rz) * Math.cos(ry);
+        double v_y = initialSpeed.magnitude() * Math.sin(rz) * Math.cos(ry);
+        double v_z = initialSpeed.magnitude() * Math.sin(ry);
         double x_0_x = 0.0;
         double x_0_z = initialPose.getZ();
 
@@ -87,7 +88,12 @@ public class SimulateNoteCommand extends Command {
         for (double t = 0.0; t < endTime; t += dt) {
             double x_t = x_0_x + horizontalMag*t;
             double z_t = x_0_z + verticalMag*t - 4.9*t*t;
+            double v_x_t = horizontalMag;
+            double v_z_t = verticalMag - 9.8*t;
 
+            // Put things back in Field coords
+            double roll = 0;
+            double pitch = -Math.atan2(v_z_t, v_x_t);
             Pose3d pose = new Pose3d(
                 new Translation3d(
                     Units.Meters.of(initialPose.getX()).plus(Units.Meters.of(x_t * Math.cos(rz))),
@@ -95,9 +101,10 @@ public class SimulateNoteCommand extends Command {
                     Units.Meters.of(z_t)
                 ),
                 new Rotation3d(
-                    0,
-                    -Math.atan2(verticalMag - 9.8*t, horizontalMag), // The axis of rotation for the note is different from how I'd have thought
-                    initialPose.getZ()
+                    roll,
+                    pitch,
+                    //-Math.atan2(verticalMag - 9.8*t, horizontalMag), // The axis of rotation for the note is different from how I'd have thought
+                    initialPose.getRotation().getZ()
                 )
             );
 
@@ -120,11 +127,12 @@ public class SimulateNoteCommand extends Command {
             new Translation3d(
                 swerveSubsystem.getPose2d().getX(),
                 swerveSubsystem.getPose2d().getY(),
-                0.5 // This should be 1 of two values depending on angle of the hinge
+                0.6 // This should be 1 of two values depending on angle of the hinge
             ),
+            // We do a bad thing here. This rotation is in Robot coords, not Field coords.
             new Rotation3d(
                 0,
-                Units.Radians.convertFrom(hingeSubsystem.getAbsoluteDegrees(), Units.Degrees),
+                Units.Radians.convertFrom(55, Units.Degrees), //Units.Radians.convertFrom(hingeSubsystem.getAbsoluteDegrees(), Units.Degrees),
                 Units.Radians.convertFrom(swerveSubsystem.getHeadingDegrees(), Units.Degrees)
             )
         );
@@ -149,6 +157,8 @@ public class SimulateNoteCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        timer.stop();
+        timer.reset();
     }
 
     @Override

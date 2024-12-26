@@ -137,9 +137,7 @@ public class SwerveSubsystem extends SubsystemBase {
         if (Robot.isReal()) {
             return Math.IEEEremainder(gyro.getAngle(), 360);
         } else {
-            System.out.println(gyroSim.getAngle());
             return Math.IEEEremainder(gyroSim.getAngle(), 360);
-            //return Math.IEEEremainder(Units.Degrees.convertFrom(gyroSim.getAngle(), Units.Radians), 360);
         }
     }
 
@@ -170,23 +168,7 @@ public class SwerveSubsystem extends SubsystemBase {
             frontLeft.getPosition(), frontRight.getPosition(),
             backLeft.getPosition(), backRight.getPosition()
         });
-        // Crashboard.toDashboard("Robot Heading", getHeading(), "navx");
-        // frontLeft.logIt();
-        // frontRight.logIt();
-        // backLeft.logIt();
-        // backRight.logIt();
-        // Crashboard.toDashboard("gyro angle", -gyro.getAngle(), "Odometry");
-        // Crashboard.toDashboard("navx odometry pose x", odometer.getPoseMeters().getX(), "Odometry");
-        // Crashboard.toDashboard("navx odometry pose y", odometer.getPoseMeters().getY(), "Odometry");
 
-        Crashboard.toDashboard("Robot Heading", getHeadingDegrees(), "navx");
-        frontLeft.logIt();
-        frontRight.logIt();
-        backLeft.logIt();
-        backRight.logIt();
-        Crashboard.toDashboard("PRE-MATCH ORIENTATION", (Math.abs(gyro.getAngle()) < 10), "Competition");           // Comp Orientation Check
-        Crashboard.toDashboard("DETERMINED POSITION", "" + AutoSelector.getLocation(), "Competition");
-        Crashboard.toDashboard("gyro angle", gyro.getAngle(), "navx");
         publisher_current.set(getModuleStates());
         fieldSim.setRobotPose(getPose2d());
     }
