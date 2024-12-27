@@ -30,7 +30,7 @@ public class ShootCommand extends Command {
     @Override
     public void initialize() {
         // Determine the speed to feed the note into the shooter.
-\
+
         if (OurRobotState.currentArmPosition == ArmPosEnum.AMP) {
 
             this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;

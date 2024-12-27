@@ -21,7 +21,7 @@ public class ShootCommandSequence extends SequentialCommandGroup {
                 Constants.ManipulatorConstants.ArmTargets.SPEAKER
             ),
             new ShootCommand(manipulatorSubsystem),
-            new SimulateNoteCommand(swerveSubsystem, hingeSubsystem),
-\        );
+            new SimulateNoteCommand(swerveSubsystem, hingeSubsystem)
+        );
     }
 }
