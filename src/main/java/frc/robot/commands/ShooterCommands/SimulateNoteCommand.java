@@ -24,6 +24,7 @@ public class SimulateNoteCommand extends Command {
 
     private final StructArrayPublisher<Pose3d> trajectoryPublisher;
     private final StructPublisher<Pose3d> notePublisher;
+
     private final SwerveSubsystem swerveSubsystem;
     private final HingeSubsystem hingeSubsystem;
     private final Timer timer;
@@ -41,7 +42,6 @@ public class SimulateNoteCommand extends Command {
 
         notePublisher = NetworkTableInstance.getDefault().getStructTopic("Note", Pose3d.struct).publish();
         notePublisher.set(new Pose3d());
-
 
         // We intentionally don't call addRequirement here,
         // because we want this to run while those subsystems are executing other commands
@@ -107,7 +107,83 @@ public class SimulateNoteCommand extends Command {
                 new Rotation3d(
                     roll,
                     pitch,
-                    //-Math.atan2(verticalMag - 9.8*t, horizontalMag), // The axis of rotation for the note is different from how I'd have thought
+                    initialPose.getRotation().getZ()
+                )
+            );
+
+            trajectory.add(pose);
+
+            // Our simple physics sim is to consider the note scored when it leaves the field
+            if (!withinField(pose)) {
+                break;
+            }
+        }
+
+        return (Pose3d[])trajectory.toArray(new Pose3d[trajectory.size()]);
+    }
+
+    private Pose3d[] calculateTrajectoryWAirResistance(Pose3d initialPose, Measure<Velocity<Distance>> initialSpeed) {
+        /*
+         * Naive strategy:
+         * 1. Move into the trajectory plane
+         * 2. Use classial mechanics to find all the points.
+         *    The rotations will follow the velocity vector
+         * 3. Convert the points in that plane back into the 3D field frame.
+         *
+         */
+        double rz = initialPose.getRotation().getZ();
+        double ry = initialPose.getRotation().getY();
+        double rx = initialPose.getRotation().getX();
+
+        double v_x = initialSpeed.magnitude() * Math.cos(rz) * Math.cos(ry);
+        double v_y = initialSpeed.magnitude() * Math.sin(rz) * Math.cos(ry);
+        double v_z = initialSpeed.magnitude() * Math.sin(ry);
+        double x_0_x = 0.0;
+        double x_0_z = initialPose.getZ();
+
+
+        // Project the launch vector into the launch plane
+        // the horizontal vector (b) is the unit vector in the xy plane
+        double b_x = Math.cos(rz);
+        double b_y = Math.sin(rz);
+
+        double horizontalMag = v_x*b_x + v_y*b_y;
+        double verticalMag = v_z;
+
+        ArrayList<Pose3d> trajectory = new ArrayList<Pose3d>(25);
+
+        // Initial conditions
+        double x_t = x_0_x;
+        double z_t = x_0_z;
+        double v_x_t = horizontalMag;
+        double v_z_t = verticalMag;
+
+        double dragCoefficient = 0.42; // https://en.wikipedia.org/wiki/Drag_coefficient
+        double airDensity = 1.293; // https://www.earthdata.nasa.gov/topics/atmosphere/air-mass-density
+        double crossSectionalArea = 0.018; // 0.05m * 0.36m. Approximated as rectangle
+
+        for (double t = 0.0; z_t > 0; t += dt) {
+            double v = Math.sqrt(v_x_t*v_x_t + v_z_t*v_z_t);
+            double forceDrag = -0.5 * dragCoefficient * airDensity * crossSectionalArea * v*v;
+
+            v_x_t = v_x_t + forceDrag * (v_x_t / v) * dt;
+            v_z_t = v_z_t + (forceDrag * (v_z_t / v) * dt) + -9.8*dt;
+
+            x_t = x_t + v_x_t*dt;
+            z_t = z_t + v_z_t*dt;
+
+            // Put things back in Field coords
+            double roll = 0;
+            double pitch = -Math.atan2(v_z_t, v_x_t);
+            Pose3d pose = new Pose3d(
+                new Translation3d(
+                    Units.Meters.of(initialPose.getX()).plus(Units.Meters.of(x_t * Math.cos(rz))),
+                    Units.Meters.of(initialPose.getY()).plus(Units.Meters.of(x_t * Math.sin(rz))),
+                    Units.Meters.of(z_t)
+                ),
+                new Rotation3d(
+                    roll,
+                    pitch,
                     initialPose.getRotation().getZ()
                 )
             );
@@ -143,7 +219,8 @@ public class SimulateNoteCommand extends Command {
         // TODO: This is a guess. It will vary depending on AMP or SPEAKER
         Measure<Velocity<Distance>> initialVelocity = Units.MetersPerSecond.of(10.0);
 
-        trajectory = caculateTrajectory(initialPose, initialVelocity);
+        //trajectory = caculateTrajectory(initialPose, initialVelocity);
+        trajectory = calculateTrajectoryWAirResistance(initialPose, initialVelocity);
 
         trajectoryPublisher.set(Arrays.copyOfRange(trajectory, 0, 0));
         notePublisher.set(trajectory[0]);
