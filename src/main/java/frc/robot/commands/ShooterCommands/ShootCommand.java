@@ -1,86 +1,71 @@
 package frc.robot.commands.ShooterCommands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.OurRobotState;
 import frc.robot.helpers.ArmPosEnum;
 import frc.robot.helpers.Crashboard;
+import frc.robot.helpers.NamedUnits.PercentOutput;
+import frc.robot.helpers.NamedUnits.RevolutionsPerMinute;
 import frc.robot.subsystems.ManipulatorSubsystem;
+
 
 public class ShootCommand extends Command {
 
-    private ManipulatorSubsystem subsystem;
-    private boolean hasReachedVelocity = false;
+    private final ManipulatorSubsystem subsystem;
+    private final Timer timer;
 
-    private double outtakeSpeed;
-    private double intakeSpeed;
-    private int  RPMsRequiredForOuttake;
-    
+    private PercentOutput intakePercentOut;
+
     public ShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
+        timer = new Timer();
 
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
+        // Determine the speed to feed the note into the shooter.
+
         if (OurRobotState.currentArmPosition == ArmPosEnum.AMP) {
 
- //           this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedAmp;
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
-            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
-            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote;
+            this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.SPEAKER) {
 
-            //this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeaker;
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
-            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
-            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
+            this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.LONG_SHOT) {
-            this.outtakeSpeed = Constants.ManipulatorConstants.outtakeSpeedSpeakerVoltage;
-            this.intakeSpeed = Constants.ManipulatorConstants.intakeSpeedWhenOuttaking;
-            this.RPMsRequiredForOuttake = Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote;
+            this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
         } else {
             // do nothing, no shooting!
-                // Shooter, no shooting!
-            this.outtakeSpeed = 0;
-            this.intakeSpeed = 0;
-            this.RPMsRequiredForOuttake = 0;
+            // Shooter, no shooting!
+            this.intakePercentOut = new PercentOutput(0);
         }
 
-        //subsystem.spinShooterVoltage(this.outtakeSpeed); // test value, make sure to change once we g
-        subsystem.setShooterSpeedByRPM(RPMsRequiredForOuttake);
+        // Kick the note out.
+        subsystem.setIntakePercentOut(intakePercentOut);
+        timer.start();
     }
 
     @Override
     public void execute() {
-        
-         Crashboard.toDashboard("shooter flywheel RPMS: ", subsystem.GetShooterVelocity(), "shooter");
-
-        if(subsystem.GetShooterVelocity()   >= this.RPMsRequiredForOuttake * 0.90){
-
-            hasReachedVelocity = true;
-
-        }
-
-        if(hasReachedVelocity){
-
-            subsystem.spintake(this.intakeSpeed);
-
-        }
+        // Condition checking done in isFinished
     }
 
     @Override
     public boolean isFinished() {
-        return false; 
+        // Give a little time for the motors to spin the note out.
+        return timer.hasElapsed(0.5);
     }
 
     @Override
     public void end(boolean interrupted) {
-        hasReachedVelocity = false;
+        timer.stop();
         subsystem.stopShooter();
         subsystem.stopIntake();
     }

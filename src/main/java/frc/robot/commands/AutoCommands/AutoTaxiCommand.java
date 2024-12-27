@@ -7,7 +7,7 @@ public class AutoTaxiCommand extends Command {
 
     private SwerveSubsystem sub;
     private double startingOrientation = 0;
-    
+
     public AutoTaxiCommand(SwerveSubsystem system) {
         sub = system;
         addRequirements(system);
@@ -15,7 +15,7 @@ public class AutoTaxiCommand extends Command {
 
     @Override
     public void initialize() {
-        startingOrientation = sub.getHeading();
+        startingOrientation = sub.getHeadingDegrees();
         if (Math.abs(startingOrientation) < 15) { startingOrientation = 0;}
     }
 
@@ -34,6 +34,6 @@ public class AutoTaxiCommand extends Command {
         sub.stopModules();
     }
 
-    
+
 
 }

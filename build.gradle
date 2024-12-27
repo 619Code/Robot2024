@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.3.1"
+    id "edu.wpi.first.GradleRIO" version "2024.3.2"
 }
 
 java {
@@ -9,6 +9,8 @@ java {
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
+
+
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -80,6 +82,15 @@ test {
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
+// Moves files into the deploy folder
+task copyChoreoToDeploy(type: Copy) {
+    from ('Choreo/deploy/choreo') {
+        include('*.traj')
+    }
+    into ('src/main/deploy/choreo')
+    
+}
+
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
@@ -88,6 +99,7 @@ jar {
     from sourceSets.main.allSource
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    dependsOn tasks.copyChoreoToDeploy
 }
 
 // Configure jar and deploy tasks

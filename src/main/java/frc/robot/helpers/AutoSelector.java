@@ -15,7 +15,6 @@ public class AutoSelector {
                 return true;
             } else return false;
         } else {
-            System.out.println("Missing Gyro. :(");
             return false;
         }
     }
@@ -28,7 +27,6 @@ public class AutoSelector {
             } else return false;
 
         } else {
-            System.out.println("Missing Gyro. :(");
             return false;
         }
     }
@@ -42,7 +40,6 @@ public class AutoSelector {
             } else return AutoLocation.CENTER;
 
         } else {
-            System.out.println("Missing Gyro. :(");
             return AutoLocation.NONE;
         }
     }

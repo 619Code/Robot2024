@@ -31,9 +31,6 @@ public class ClimbWithArmCommandDown extends Command {
 
     @Override
     public boolean isFinished() {
-        //System.out.println(":3333333333333");
-        //return subsystem.isAtPosition(Constants.HingeConstants.kAmpAngle, 0 /*temp deadzone*/);
-        //return system.getController().atGoal();// || system.outputThresholdReached(12);
         return true;
     }
 

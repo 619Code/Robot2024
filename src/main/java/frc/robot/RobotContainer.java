@@ -1,11 +1,15 @@
 package frc.robot;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import java.util.function.BooleanSupplier;
+
 import java.util.Optional;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -14,49 +18,41 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ManipulatorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.GroundIntakeCommand;
-import frc.robot.commands.LedAnimationCommand;
-import frc.robot.commands.AutoCommands.AutoShootCommand;
-import frc.robot.commands.ClimbCommands.ClimbCommand;
+import frc.robot.commands.AutoCommands.FollowTrajectoryCommand;
 import frc.robot.commands.ClimbCommands.ClimbCommandDown;
 import frc.robot.commands.ClimbCommands.ClimbCommandUp;
 import frc.robot.commands.DrivetrainCommands.DriveToPointCommand;
 import frc.robot.commands.DrivetrainCommands.SwerveCommand;
 import frc.robot.commands.HingeCommands.HingeInitializeCommand;
 import frc.robot.commands.ShooterCommands.ClimbWithArmCommand;
-import frc.robot.commands.ShooterCommands.DefaultShootCommand;
 import frc.robot.commands.ShooterCommands.ClimbWithArmCommandDown;
 import frc.robot.commands.ShooterCommands.GoToAmpPosCommand;
 import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
-import frc.robot.commands.ShooterCommands.GoToInakePosCommandGroundIntakeTesting;
 import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
-import frc.robot.commands.ShooterCommands.GoToTrussPosCommand;
 import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.commands.ShooterCommands.OuttakeCommand;
+import frc.robot.commands.ShooterCommands.RevUpShooterCommand;
 import frc.robot.commands.ShooterCommands.ShootCommand;
+import frc.robot.commands.ShooterCommands.ShootCommandSequence;
+import frc.robot.commands.ShooterCommands.SimulateNoteCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
-import frc.robot.commands.Unused.TestHingeCommand;
 import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
-import frc.robot.subsystems.AutoSwitchBoardSub;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.GroundIntakeSubsystem;
 import frc.robot.subsystems.HingeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ledSubsystem;
 
+enum Autos {
+    DO_NOTHING,
+    JUST_SHOOT,
+    FORWARD_SIDE,
+    SOURCE_SIDE,
+    AMP_SIDE
+}
+
 public class RobotContainer {
 
-    //private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    //private final TestHingeSubsystem testHingeSubsystem = new TestHingeSubsystem();
-    private final HingeSubsystem hingeSubsystem = new HingeSubsystem();
-    private final Joystick driverOne = new Joystick(0);
-    private final CommandXboxController operatorController = new CommandXboxController(1);
-    private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
-    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-    private final GroundIntakeSubsystem groundIntakeSubsystem = new GroundIntakeSubsystem();
-    private final AutoSwitchBoardSub switchBoard = new AutoSwitchBoardSub(false);
-    private final ledSubsystem LEDs = new ledSubsystem();        
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -74,92 +70,149 @@ public class RobotContainer {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(enableDrivetrain);
+    private final HingeSubsystem hingeSubsystem = new HingeSubsystem();
+    //private final Joystick driverOne = new Joystick(0);
+    private final CommandXboxController controller = new CommandXboxController(0);
+    private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem(enableManipulator);
+    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+    private final ledSubsystem LEDs = new ledSubsystem();
 
-    public RobotContainer() {
+    public RobotContainer(Autos auto) {
+
+        switch (auto) {
+            case JUST_SHOOT:
+            {
+                //just shoot speaker
+                break;
+            }
+
+
+            case FORWARD_SIDE:
+            {
+                // Tell the odeometry where we are
+                swerveSubsystem.initializePose(new Pose2d(
+                    Units.Meters.of(1.348),
+                    Units.Meters.of(5.512),
+                    Rotation2d.fromDegrees(180)
+                ));
+                break;
+            }
+
+            case SOURCE_SIDE:
+            {
+                // Tell the odeometry where we are
+                swerveSubsystem.initializePose(new Pose2d(
+                    Units.Meters.of(0.672),
+                    Units.Meters.of(4.385),
+                    Rotation2d.fromDegrees(120)
+                ));
+
+                //   Starting source side (automatically detects red or blue)
+                break;
+            }
+
+
+            case AMP_SIDE:
+            {
+                // Tell the odeometry where we are
+                swerveSubsystem.initializePose(new Pose2d(
+                    Units.Meters.of(0.738),
+                    Units.Meters.of(6.661),
+                    Rotation2d.fromDegrees(-120)
+                ));
+
+                //shoot and taxi
+                break;
+            }
+
+            case DO_NOTHING:
+            default:
+            {
+                break;
+            }
+        }
 
         AutoSelector.setGyro(swerveSubsystem.getGyro());
-
-        if (enableDrivetrain) {
-            swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
-        }
-
-        if (enableHinge) {
-            hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
-        }
-
-        if (enableManipulator) {
-            manipulatorSubsystem.setDefaultCommand(new DefaultShootCommand(manipulatorSubsystem));
-        }
-
-        if (enableClimb) {
-            //
-        }
-
-        if (enableAutoSwitchBoard) {
-            //
-        }
-
-        if (enableLEDs)
-        {
-            LEDs.setDefaultCommand(new LedAnimationCommand(LEDs));
-        }
-
-        configureButtonBindings();
     }
 
-    private void configureButtonBindings() {
+    /**
+     * Helper function to smooth out controller input and adds a deadband.
+     * @param axis Value between [-1.0, 1.0] from a controller axis
+     * @return Smoothed value between [-1.0, 1.0]
+     */
+    private double axisSmoother(double axis) {
+        double deadband = 0.1;
+        if (Math.abs(axis) < deadband) {
+            return 0.0;
+        }
+
+        // x^2
+        return axis * axis * Math.signum(axis);
+
+    }
+
+    public void configureForTeleop() {
 
         if (enableDrivetrain) {
-            swerveSubsystem.setDefaultCommand(new SwerveCommand(swerveSubsystem, driverOne));
+            final boolean onLinux = System.getProperty("os.name").equals("Linux");
+            swerveSubsystem.setDefaultCommand(new SwerveCommand(
+                swerveSubsystem,
+                () -> {return axisSmoother(-controller.getLeftY());}, // dx
+                () -> {return axisSmoother(-controller.getLeftX());}, // dy
+                () -> {
+                    // On Linux, the RightX and RightTrigger axes are swapped from Windows
+                    if (onLinux) {
+                        return axisSmoother(controller.getRightTriggerAxis());
+                    } else {
+                        return axisSmoother(controller.getRightX());
+                    }
+                }, //domega
+                (BooleanSupplier)controller.rightBumper(), // slow mode
+                (BooleanSupplier)controller.leftStick() // reorient
+            ));
         }
 
         if (enableHinge) {
+            // Reset the encoders first
+            new HingeInitializeCommand(hingeSubsystem).schedule();
+
             hingeSubsystem.setDefaultCommand(new GoToShootPosCommand(hingeSubsystem));
-                
-    
-            operatorController.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-            operatorController.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
 
-            //operatorController.start().onTrue(new HingeInitializeCommand(hingeSubsystem));
-            operatorController.b().whileTrue(new TestHingeCommand(hingeSubsystem, operatorController));
-
-            //operatorController.rightTrigger().whileTrue(new GoToInakePosCommand(hingeSubsystem));
-
-            operatorController.x().whileTrue(new GoToTrussPosCommand(hingeSubsystem));
-            
+            controller.y().whileTrue(new GoToInakePosCommand(hingeSubsystem));
+            controller.a().whileTrue(new GoToAmpPosCommand(hingeSubsystem));
+            controller.x().whileTrue(new ClimbWithArmCommand(hingeSubsystem));
         }
 
         if (enableManipulator) {
             //  =========   MANIPULATOR BINDINGS   =========
-            Trigger shooTrigger = operatorController.leftTrigger();
-            shooTrigger.onTrue(new ShootCommand(manipulatorSubsystem));
-            shooTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+            controller.leftTrigger().onTrue(new ShootCommand(manipulatorSubsystem));
+            controller.leftTrigger().onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-            Trigger intakeTrigger = operatorController.y();
-            intakeTrigger.onTrue(new IntakeCommand(manipulatorSubsystem));
-            intakeTrigger.onFalse(new StopManipulatorCommand(manipulatorSubsystem));
+            controller.y().onTrue(new IntakeCommand(manipulatorSubsystem));
+            controller.y().onFalse(new StopManipulatorCommand(manipulatorSubsystem));
 
-            Trigger outtakeTrigger = operatorController.rightTrigger();
-            outtakeTrigger.whileTrue(new OuttakeCommand(manipulatorSubsystem));
+            controller.rightTrigger().whileTrue(new OuttakeCommand(manipulatorSubsystem));
 
+            controller.b().onTrue(new ShootCommandSequence(
+                swerveSubsystem,
+                manipulatorSubsystem,
+                hingeSubsystem
+            ));
+
+            controller.rightBumper().onTrue(Commands.runOnce(
+                () -> {
+                    System.out.println("Stop shooter");
+                    manipulatorSubsystem.stopAll();
+                },
+                manipulatorSubsystem)
+            );
         }
-
-        // if (enableClimb && false) {
-        //     Trigger newClimbTrigger = operatorController.back();
-
-        //      newClimbTrigger.onTrue(new ClimbCommand(climbSubsystem));
-        //      newClimbTrigger.onFalse(new ClimbCommand(climbSubsystem));
-            
-        //     if (enableHinge) {
-        //         newClimbTrigger.whileTrue(new ClimbWithArmCommand(hingeSubsystem));
-        //     }
-        // }
 
         if (enableClimb)
         {
-            Trigger upClimbTrigger = operatorController.back();
-            Trigger downClimbTrigger = operatorController.start();
+            Trigger upClimbTrigger = controller.back();
+            Trigger downClimbTrigger = controller.start();
 
             upClimbTrigger.onTrue(new ClimbCommandUp(climbSubsystem));
             upClimbTrigger.onTrue(new ClimbWithArmCommand(hingeSubsystem));
@@ -168,34 +221,15 @@ public class RobotContainer {
             downClimbTrigger.onTrue(new SequentialCommandGroup(new WaitCommand(.75), new ClimbWithArmCommandDown(hingeSubsystem)));
         }
 
-        if (enableGroundIntake) {
-            // Trigger intakeTrigger = operatorController.rightTrigger();
-            // intakeTrigger.whileTrue(new GroundIntakeCommand(groundIntakeSubsystem));
-        }
-
         if (enableLEDs) {
             LEDs.setColor(0, 0, 255);
         }
-        
+
         //   =========   OTHER BINDINGS   =========
-    
     }
 
-    public SwerveSubsystem getSwerve() {
-        return swerveSubsystem;
-    }
-
-    public void InitializeHinge() {
-        new HingeInitializeCommand(hingeSubsystem).schedule();
-    }
-
-    public Command getAutonomousCommand() {
-
-        int selectedAuto = 0;
-        if (enableAutoSwitchBoard) selectedAuto = switchBoard.getSwitchCombo();
-        System.out.println(selectedAuto);
-
-        // ally multiplier is used to set the proper direction for 
+    public Command getAutonomousCommand(Autos auto) {
+        // ally multiplier is used to set the proper direction for
         //  red vs blue since they are mirrored
         int allyMultiplier = 1;
         Optional<Alliance> ally = DriverStation.getAlliance();
@@ -205,67 +239,56 @@ public class RobotContainer {
 
         Crashboard.toDashboard("Alliance: ", ally.get().toString(), "Competition");
 
-        if (!switchBoard.shouldTaxi()) {
-            //just shoot speaker
-            return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-                .andThen(new AutoShootCommand(manipulatorSubsystem));
-        } else if(switchBoard.isPositionForward()) {
-                //  Shoot, delay and move at end of autonomous            
-                 return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-                .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new WaitCommand(9.0))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3));
-                
+        switch (auto) {
 
-        }else if(switchBoard.isPositionSourceSide()){
+            case JUST_SHOOT:
+            {
+                //just shoot speaker
+                return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
+                    .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
+                        new Rotation2d(0),
+                        new Rotation2d(0),
+                        new Rotation2d(0),
+                        new Rotation2d(0)}))
+                    .andThen(new ShootCommand(manipulatorSubsystem));
+            }
 
-            //   Starting source side (automatically detects red or blue)
-            return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-                .andThen(() -> swerveSubsystem.resetOdometry())
-                .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new WaitCommand(5.0))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, 1.0 * allyMultiplier, 0.3))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15));
-                //.andThen(() -> swerveSubsystem.reorientMidMatch());
 
-        } else if (switchBoard.isPositionAmpSide()) {
-            //shoot and taxi
-            return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-                .andThen(new AutoShootCommand(manipulatorSubsystem))
-                .andThen(new WaitCommand(8.0))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -0.7, -.3 * allyMultiplier, 0.3))
-                .andThen(new DriveToPointCommand(swerveSubsystem, -1.3, 2.1 * allyMultiplier, 0.3))
-                .andThen(new DriveToPointCommand(swerveSubsystem, 30 * allyMultiplier, 0.15));
-                //.andThen(() -> swerveSubsystem.reorientMidMatch());
+            case FORWARD_SIDE:
+            {
+                return Commands.sequence(
+                    new ShootCommand(manipulatorSubsystem),
+                    new WaitCommand(1.0),
+                    new DriveToPointCommand(swerveSubsystem, -1.5,0, 0.3)
+                );
+            }
+
+            case SOURCE_SIDE:
+            {
+
+                //   Starting source side (automatically detects red or blue)
+                return Commands.sequence(
+                    new ShootCommand(manipulatorSubsystem),
+                    new WaitCommand(1.0),
+                    new DriveToPointCommand(swerveSubsystem, -1.7, 1.0 * allyMultiplier, 0.3),
+                    new DriveToPointCommand(swerveSubsystem, -1.7, -1.7 * allyMultiplier, 0.3),
+                    new DriveToPointCommand(swerveSubsystem, -30 * allyMultiplier, 0.15)
+                );
+            }
+
+
+            case AMP_SIDE:
+            {
+                //shoot and taxi
+                return new FollowTrajectoryCommand("TestPath", swerveSubsystem, false);
+            }
+
+            case DO_NOTHING:
+            default:
+            {
+                return Commands.idle();
+            }
         }
 
-        else return Commands.runOnce(() -> swerveSubsystem.zeroHeading())
-                .andThen( () -> swerveSubsystem.getKinematics().resetHeadings(new Rotation2d[] {
-            new Rotation2d(0), 
-            new Rotation2d(0),
-            new Rotation2d(0),
-            new Rotation2d(0)}))
-                .andThen(new AutoShootCommand(manipulatorSubsystem));
     }
 }

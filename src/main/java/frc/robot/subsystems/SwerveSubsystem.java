@@ -1,28 +1,35 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.helpers.AutoSelector;
 import frc.robot.helpers.Crashboard;
 
 public class SwerveSubsystem extends SubsystemBase {
+    public final boolean enabled;
+
     public static final double MAX_VOLTAGE = 12.0;
     public final SwerveModule frontLeft;
-    public final SwerveModule frontRight; 
+    public final SwerveModule frontRight;
     public final SwerveModule backLeft;
     public final SwerveModule backRight;
     public final StructArrayPublisher<SwerveModuleState> publisher;
@@ -36,6 +43,11 @@ public class SwerveSubsystem extends SubsystemBase {
     private final StructArrayPublisher<SwerveModuleState> publisher_current;
     private final StructArrayPublisher<SwerveModuleState> publisher_desired;
 
+    /* ------------------- Simulation objects -------------------- */
+    private final Field2d fieldSim;
+    private final AnalogGyro dummyGryo = new AnalogGyro(0); // The simulated version crashes without this
+    private final AnalogGyroSim gyroSim = new AnalogGyroSim(0);
+
     SwerveModuleState[] states = new SwerveModuleState[] {
         new SwerveModuleState(),
         new SwerveModuleState(),
@@ -47,7 +59,9 @@ public class SwerveSubsystem extends SubsystemBase {
         30, 12, 30, 12, 30, 12, 30, 12
     };
 
-    public SwerveSubsystem() {
+    public SwerveSubsystem(boolean enabled) {
+        this.enabled = enabled;
+
         frontLeft = new SwerveModule(
             "Front Left",
             DriveConstants.kFrontLeftDriveMotorPort,
@@ -99,66 +113,64 @@ public class SwerveSubsystem extends SubsystemBase {
 
         odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
-//MUST USE A / IN THE NAME OR DIE
+        // MUST USE A / IN THE NAME
         publisher_current = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("/MyStatesExpected", SwerveModuleState.struct).publish();
+            .getStructArrayTopic("/SwerveMeasured", SwerveModuleState.struct).publish();
         publisher_desired = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("/MyStatesDesired", SwerveModuleState.struct).publish();
+            .getStructArrayTopic("/SwerveCommanded", SwerveModuleState.struct).publish();
 
         publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                zeroHeading();
-                
-            } 
-            catch (Exception e) {
-            }
-        }).start();
-    }
-    
-    public void zeroHeading() {
-        gyro.reset();
-        
+
+        fieldSim = new Field2d();
+        SmartDashboard.putData("Field", fieldSim);
+
     }
 
-    public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(), 360);
+    public void zeroHeading() {
+        gyro.reset();
+        gyroSim.resetData();
+    }
+
+    // This really should return type Degrees, but we don't want
+    // to do an allocation each time.
+    public double getHeadingDegrees() {
+        if (Robot.isReal()) {
+            return Math.IEEEremainder(gyro.getAngle(), 360);
+        } else {
+            return Math.IEEEremainder(gyroSim.getAngle(), 360);
+        }
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        return Rotation2d.fromDegrees(getHeadingDegrees());
     }
+
+    @Override
+    public void simulationPeriodic() {
+        // Update our fake motors and gyro
+        double dt = 0.02; // 20ms
+
+        frontLeft.updateSim(dt);
+        frontRight.updateSim(dt);
+        backLeft.updateSim(dt);
+        backRight.updateSim(dt);
+
+        ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+        double dOmega = Units.Degrees.convertFrom(chassisSpeeds.omegaRadiansPerSecond * dt, Units.Radians);
+
+        gyroSim.setAngle(getHeadingDegrees() + dOmega);
+    }
+
+    // This runs in both simulation and real robot operations
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(), frontRight.getPosition(),
             backLeft.getPosition(), backRight.getPosition()
         });
-        // Crashboard.toDashboard("Robot Heading", getHeading(), "navx");
-        // frontLeft.logIt();
-        // frontRight.logIt();
-        // backLeft.logIt();
-        // backRight.logIt();
-        // Crashboard.toDashboard("gyro angle", -gyro.getAngle(), "Odometry");
-        // Crashboard.toDashboard("navx odometry pose x", odometer.getPoseMeters().getX(), "Odometry");
-        // Crashboard.toDashboard("navx odometry pose y", odometer.getPoseMeters().getY(), "Odometry");
 
-        Crashboard.toDashboard("Robot Heading", getHeading(), "navx");
-        frontLeft.logIt();
-        frontRight.logIt();
-        backLeft.logIt();
-        backRight.logIt();
-        Crashboard.toDashboard("PRE-MATCH ORIENTATION", (Math.abs(gyro.getAngle()) < 10), "Competition");           // Comp Orientation Check
-        Crashboard.toDashboard("DETERMINED POSITION", "" + AutoSelector.getLocation(), "Competition");
-        Crashboard.toDashboard("gyro angle", gyro.getAngle(), "navx");
-        publisher_current.set(getModuleStates(), 0);
-        //System.out.println(getModuleStates()[1].speedMetersPerSecond);
-        //System.out.println(getModuleStates()[1].angle);
-        //SmartDashboard.putNumber("Front Right Wheel Angle", frontRight.getAbsoluteEncoderDeg());
-        //SmartDashboard.putNumber("Back Left Wheel Angle", backLeft.getAbsoluteEncoderDeg());
-        //SmartDashboard.putNumber("Back Right Wheel Angle", backRight.getAbsoluteEncoderDeg());
-        //SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        publisher_current.set(getModuleStates());
+        fieldSim.setRobotPose(getPose2d());
     }
 
     public void stopModules() {
@@ -170,15 +182,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        frontLeft.setDesiredState(desiredStates[0]);
-        frontRight.setDesiredState(desiredStates[1]);
-        backLeft.setDesiredState(desiredStates[2]);
-        backRight.setDesiredState(desiredStates[3]);
-        publisher.set(desiredStates);
-        //System.out.println(desiredStates);
-        publisher_desired.set(desiredStates, 0);
-        System.out.println(desiredStates);
+        if (enabled) {
+            SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+            frontLeft.setDesiredState(desiredStates[0]);
+            frontRight.setDesiredState(desiredStates[1]);
+            backLeft.setDesiredState(desiredStates[2]);
+            backRight.setDesiredState(desiredStates[3]);
+            publisher.set(desiredStates);
+            publisher_desired.set(desiredStates);
+        }
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -200,6 +212,14 @@ public class SwerveSubsystem extends SubsystemBase {
         backRight.resetEncoders();
     }
 
+    public void ResetRelativePositionEncoders(Rotation2d rotation)
+    {
+        frontLeft.resetEncoders(rotation);
+        frontRight.resetEncoders(rotation);
+        backLeft.resetEncoders(rotation);
+        backRight.resetEncoders(rotation);
+    }
+
     public void resetOdometry() {
         odometer.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
             frontLeft.getPosition(),
@@ -210,19 +230,27 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void reorientMidMatch() {
-        new Thread(() -> {
-            try {
-                zeroHeading();
-            } 
-            catch (Exception e) {
-            }
-        }).start();
+        zeroHeading();
     }
 
     public AHRS getGyro() {
         return gyro;
     }
-    
 
-    
+    public void initializePose(Pose2d initialPose) {
+        // Reset all the things
+        gyroSim.setAngle(initialPose.getRotation().getDegrees());
+        odometer.resetPosition(
+            initialPose.getRotation(),
+            new SwerveModulePosition[] {
+                frontLeft.getPosition(),
+                frontRight.getPosition(),
+                backLeft.getPosition(),
+                backRight.getPosition()
+            },
+            initialPose);
+        ResetRelativePositionEncoders(initialPose.getRotation());
+        fieldSim.setRobotPose(initialPose);
+    }
+
 }

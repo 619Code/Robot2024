@@ -23,12 +23,7 @@ public class Limelight extends SubsystemBase{
         NetworkTableEntry ta = table.getEntry("ta");
         double id = LimelightHelpers.getFiducialID("");
         
-        //System.out.println();
-        //System.out.println(LimelightHelpers.getTX(""));
-        //System.out.println(LimelightHelpers.getTY(""));
-        //System.out.println(LimelightHelpers.getTA(""));
         System.out.println(LimelightHelpers.getBotPose_TargetSpace("")[0]);
-        //System.out.println(id);
 
         Crashboard.toDashboard("tx", tx.getDouble(0.0), "Limelight");
         Crashboard.toDashboard("ty", ty.getDouble(0.0), "Limelight");

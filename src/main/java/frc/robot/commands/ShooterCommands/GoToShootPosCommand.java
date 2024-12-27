@@ -23,14 +23,12 @@ public class GoToShootPosCommand extends Command {
             subsystem.setGoal(Constants.HingeConstants.kShootingAngle);
         }
         subsystem.enable();
-        //System.out.println("I am initialize");
         OurRobotState.currentArmPosition = ArmPosEnum.SPEAKER;
     }
 
     @Override
     public void execute() {
         subsystem.enable();
-        //System.out.println("I am execute");
     }
 
     @Override
