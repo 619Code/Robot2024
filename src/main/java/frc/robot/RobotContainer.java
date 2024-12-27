@@ -31,7 +31,9 @@ import frc.robot.commands.ShooterCommands.GoToInakePosCommand;
 import frc.robot.commands.ShooterCommands.GoToShootPosCommand;
 import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.commands.ShooterCommands.OuttakeCommand;
+import frc.robot.commands.ShooterCommands.RevUpShooterCommand;
 import frc.robot.commands.ShooterCommands.ShootCommand;
+import frc.robot.commands.ShooterCommands.ShootCommandSequence;
 import frc.robot.commands.ShooterCommands.SimulateNoteCommand;
 import frc.robot.commands.ShooterCommands.StopManipulatorCommand;
 import frc.robot.helpers.AutoSelector;
@@ -192,10 +194,19 @@ public class RobotContainer {
 
             controller.rightTrigger().whileTrue(new OuttakeCommand(manipulatorSubsystem));
 
-            controller.b().onTrue(new SimulateNoteCommand(
+            controller.b().onTrue(new ShootCommandSequence(
                 swerveSubsystem,
+                manipulatorSubsystem,
                 hingeSubsystem
             ));
+
+            controller.rightBumper().onTrue(Commands.runOnce(
+                () -> {
+                    System.out.println("Stop shooter");
+                    manipulatorSubsystem.stopAll();
+                },
+                manipulatorSubsystem)
+            );
         }
 
         if (enableClimb)

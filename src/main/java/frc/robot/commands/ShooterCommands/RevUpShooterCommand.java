@@ -10,7 +10,7 @@ public class RevUpShooterCommand extends Command {
     private final ManipulatorSubsystem manipulatorSubsystem;
     private final ArmTargets targetPos;
 
-    RevUpShooterCommand(ManipulatorSubsystem manipulatorSubsystem, ArmTargets targetPos) {
+    public RevUpShooterCommand(ManipulatorSubsystem manipulatorSubsystem, ArmTargets targetPos) {
         this.manipulatorSubsystem = manipulatorSubsystem;
         this.targetPos = targetPos;
 
@@ -20,7 +20,7 @@ public class RevUpShooterCommand extends Command {
     @Override
     public void initialize() {
         if (ArmTargets.SPEAKER == targetPos) {
-            manipulatorSubsystem.setShooterRPM(Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote);
+            manipulatorSubsystem.setShooterRPM(Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote);
         } else {
             manipulatorSubsystem.setShooterRPM(Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote);
         }
@@ -39,9 +39,9 @@ public class RevUpShooterCommand extends Command {
     @Override
     public boolean isFinished() {
         if (ArmTargets.SPEAKER == targetPos) {
-            return manipulatorSubsystem.getShooterRPM().gt(Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote);
+            return manipulatorSubsystem.getShooterRPM().isNear(Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote, 0.05);
         } else {
-            return manipulatorSubsystem.getShooterRPM().gt(Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote);
+            return manipulatorSubsystem.getShooterRPM().isNear(Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote, 0.05);
         }
     }
 }

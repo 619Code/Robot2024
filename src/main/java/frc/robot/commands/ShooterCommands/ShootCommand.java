@@ -1,5 +1,6 @@
 package frc.robot.commands.ShooterCommands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -14,69 +15,57 @@ import frc.robot.subsystems.ManipulatorSubsystem;
 
 public class ShootCommand extends Command {
 
-    private ManipulatorSubsystem subsystem;
-    private boolean hasReachedVelocity = false;
+    private final ManipulatorSubsystem subsystem;
+    private final Timer timer;
 
     private PercentOutput intakePercentOut;
-    private RevolutionsPerMinute RPMRequiredForOuttake;
 
     public ShootCommand(ManipulatorSubsystem subsystem) {
         this.subsystem = subsystem;
+        timer = new Timer();
 
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
+        // Determine the speed to feed the note into the shooter.
+\
         if (OurRobotState.currentArmPosition == ArmPosEnum.AMP) {
 
             this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
-            this.RPMRequiredForOuttake = Constants.ManipulatorConstants.ampShooterVelocityToReachBeforeFeedingNote;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.SPEAKER) {
 
             this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
-            this.RPMRequiredForOuttake = Constants.ManipulatorConstants.speakerShooterVelocityToReachBeforeFeedingNote;
 
         } else if (OurRobotState.currentArmPosition == ArmPosEnum.LONG_SHOT) {
             this.intakePercentOut = Constants.ManipulatorConstants.intakePercentOutWhenOuttaking;
-            this.RPMRequiredForOuttake = Constants.ManipulatorConstants.passerShooterVelocityToReachBeforeFeedingNote;
         } else {
             // do nothing, no shooting!
             // Shooter, no shooting!
             this.intakePercentOut = new PercentOutput(0);
-            this.RPMRequiredForOuttake = new RevolutionsPerMinute(0);
         }
 
-        subsystem.setShooterRPM(RPMRequiredForOuttake);
+        // Kick the note out.
+        subsystem.setIntakePercentOut(intakePercentOut);
+        timer.start();
     }
 
     @Override
     public void execute() {
-
-        Crashboard.toDashboard("shooter flywheel RPMS: ", subsystem.getShooterRPM().magnitude(), "shooter");
-
-        if(subsystem.getShooterRPM().gte(RPMRequiredForOuttake.times(0.9))){
-
-            hasReachedVelocity = true;
-
-        }
-
-        if(hasReachedVelocity){
-
-            subsystem.setIntakePercentOut(this.intakePercentOut);
-
-        }
+        // Condition checking done in isFinished
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        // Give a little time for the motors to spin the note out.
+        return timer.hasElapsed(0.5);
     }
 
     @Override
     public void end(boolean interrupted) {
-        hasReachedVelocity = false;
+        timer.stop();
         subsystem.stopShooter();
         subsystem.stopIntake();
     }

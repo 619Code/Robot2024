@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -8,6 +9,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -22,6 +25,7 @@ import frc.robot.Constants;
 import frc.robot.OurRobotState;
 import frc.robot.Robot;
 import frc.robot.helpers.Crashboard;
+import frc.robot.helpers.TunablePIDFController;
 import frc.robot.helpers.NamedUnits.PercentOutput;
 import frc.robot.helpers.NamedUnits.RevolutionsPerMinute;
 
@@ -37,9 +41,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
     private final DCMotorSim shooterSim;
     private final DCMotorSim intakeSim;
+    private final DoublePublisher shooterVelocityPublisher;
+    private final DoublePublisher shooterVoltagePublisher;
 
-    private final PIDController shooterOnboardPID;
-    private final SimpleMotorFeedforward shooterFeedforward;
+    private final DoublePublisher intakeVelocityPublisher;
+
+    private final TunablePIDFController shooterOnboardPIDF;
     private final MutableMeasure<Velocity<Angle>> shooterRPMSetpoint = MutableMeasure.zero(Units.RPM);
 
     public ManipulatorSubsystem(boolean enabled) {
@@ -61,10 +68,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
         shooterEncoder = this.shooterLeader.getEncoder();
 
+        // TODO: These numbers are nonsense for this
         shooterSim = new DCMotorSim(
             DCMotor.getNEO(1),
             1.0,
-            0.000418
+            0.0002
         );
 
         intakeSim = new DCMotorSim(
@@ -73,18 +81,27 @@ public class ManipulatorSubsystem extends SubsystemBase {
             0.000418
         );
 
-        shooterOnboardPID = new PIDController(
-            Constants.ManipulatorConstants.SHOOTER_KP,
-            Constants.ManipulatorConstants.SHOOTER_KI,
-            Constants.ManipulatorConstants.SHOOTER_KD
-        );
-        shooterFeedforward = new SimpleMotorFeedforward(
-            Constants.ManipulatorConstants.SHOOTER_KS,
-            Constants.ManipulatorConstants.SHOOTER_KV,
-            Constants.ManipulatorConstants.SHOOTER_KA
-        );
+        shooterVelocityPublisher = NetworkTableInstance.getDefault().getTable("Shuffleboard/Manipulator").getDoubleTopic("ShooterVelocity").publish();
+        shooterVoltagePublisher = NetworkTableInstance.getDefault().getTable("Shuffleboard/Manipulator").getDoubleTopic("ShooterVoltage").publish();
+        intakeVelocityPublisher = NetworkTableInstance.getDefault().getTable("Shuffleboard/Manipulator").getDoubleTopic("IntakeVelocity").publish();
 
-        shooterOnboardPID.setSetpoint(shooterRPMSetpoint.magnitude());
+        shooterVelocityPublisher.set(0.0);
+        shooterVoltagePublisher.set(0.0);
+        intakeVelocityPublisher.set(0.0);
+
+        shooterOnboardPIDF = new TunablePIDFController(
+            "ShooterPID",
+            0.003,
+            0,
+            0,
+            0.001, //Constants.ManipulatorConstants.SHOOTER_KS,
+            0.002, //Constants.ManipulatorConstants.SHOOTER_KV,
+            0  //Constants.ManipulatorConstants.SHOOTER_KA
+        );
+        // TODO
+        shooterOnboardPIDF.setTuningMode(true);
+
+        shooterOnboardPIDF.setSetpoint(shooterRPMSetpoint.magnitude());
     }
 
     @Override
@@ -101,13 +118,26 @@ public class ManipulatorSubsystem extends SubsystemBase {
         // Update our PID controller
         if (enabled) {
             if (Robot.isReal()) {
-                shooterLeader.setVoltage(shooterOnboardPID.calculate(shooterEncoder.getVelocity()) + shooterFeedforward.calculate(shooterRPMSetpoint.magnitude()));
+                double shooterSpeed = shooterEncoder.getVelocity();
+                double voltage = shooterOnboardPIDF.calculate(shooterSpeed);
+                shooterLeader.setVoltage(voltage);
+
+                shooterVelocityPublisher.set(shooterSpeed);
+                shooterVoltagePublisher.set(voltage);
             } else {
-                shooterSim.setInputVoltage(shooterOnboardPID.calculate(shooterSim.getAngularVelocityRPM()) + shooterFeedforward.calculate(shooterRPMSetpoint.magnitude()));
+                double shooterSpeed = shooterSim.getAngularVelocityRPM();
+
+                shooterSim.setInputVoltage(shooterOnboardPIDF.calculate(shooterSpeed));
+
+                shooterVelocityPublisher.set(shooterSpeed);
+
+                intakeVelocityPublisher.set(intakeSim.getAngularVelocityRPM());
             }
         }
     }
 
+    // TODO: Make this a mutableRevolutionsPerMinute. We're going to
+    // run out of memory by creating this many objects
     public RevolutionsPerMinute getShooterRPM() {
         if (Robot.isReal()) {
             return new RevolutionsPerMinute(shooterEncoder.getVelocity());
@@ -121,7 +151,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
             // Update the setpoint. The actual motor is controlled
             // in the periodic loop so we get continous feedback
             shooterRPMSetpoint.mut_replace(rpm);
-            shooterOnboardPID.setSetpoint(shooterRPMSetpoint.magnitude());
+            shooterOnboardPIDF.setSetpoint(shooterRPMSetpoint.magnitude());
         }
     }
 
@@ -133,6 +163,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
                 shooterSim.setInputVoltage(voltage.magnitude());
             }
         }
+    }
+
+    public boolean hasShooterReachedRPM(RevolutionsPerMinute rpm) {
+        return rpm.isNear(getShooterRPM(), 0.05);
     }
 
     /**
@@ -171,6 +205,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
 
     public void stopShooter(){
+        shooterRPMSetpoint.mut_setMagnitude(0);
+        shooterOnboardPIDF.setSetpoint(shooterRPMSetpoint.magnitude());
+
         if (Robot.isReal()) {
             shooterLeader.stopMotor();
         } else {
@@ -179,7 +216,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
 
     public void stopAll(){
-        intakeLeader.stopMotor();
-        shooterLeader.stopMotor();
+        stopShooter();
+        stopIntake();
     }
 }
